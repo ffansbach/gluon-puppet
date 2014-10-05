@@ -1,0 +1,4 @@
+#! /bin/sh
+dkms remove -m batman-adv -v 2013.4.0 -k `uname -r`
+dkms install -m batman-adv -v 2013.4.0 --force
+touch /root/batman-adv-`uname -r`.stamp

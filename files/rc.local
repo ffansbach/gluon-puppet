@@ -1,0 +1,6 @@
+#!/bin/sh -e
+
+/sbin/ip route add unreachable default table 42
+/sbin/ip rule add from all fwmark 0x2342 table 42
+
+exit 0
