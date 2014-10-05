@@ -46,7 +46,7 @@ class gluon {
         require     => File['/usr/local/sbin/install-batman-adv'],
     }
 
-    kmod::install { 'batmand-adv':
+    kmod::load { 'batman-adv':
         require     => Exec['install-batman-adv'],
     }
 
