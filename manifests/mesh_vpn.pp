@@ -8,48 +8,87 @@ define gluon::mesh_vpn (
     $ip6_address    = undef,
 
     $fastd_port     = 10000,
+
+    $forward_iface  = false,
 ) {
     include gluon
 
-    network::interface { "br-$community":
+    network::interface { "br_$community":
         auto            => false,
         bridge_ports    => 'none',
         ipaddress       => $ip_address,
         netmask         => $netmask,
         post_up         => [
-            "iptables -t mangle -I PREROUTING -i br-$community -j MARK --set-mark 0x2342/0xffffffff",
-            "ip -6 a a $ip6_address/64 dev br-$community",
+            "ip -6 a a $ip6_address/64 dev br_$community",
         ],
-        before          => Network::Interface["bat-$community"],
+        before          => Network::Interface["bat_$community"],
     }
 
-    network::interface { "bat-$community":
+    network::interface { "bat_$community":
         auto            => false,
         address         => false,
         family          => 'inet6',
         method          => 'manual',
         pre_up          => [
-            "batctl -m bat-$community if add mesh-$community",
-            "batctl -m bat-$community gw server",
-            "ifup br-$community",
+            "batctl -m bat_$community if add mesh_$community",
+            "batctl -m bat_$community gw server",
+            "ifup br_$community",
         ],
         up              => [
-            "ip link set bat-$community up",
+            "ip link set bat_$community up",
         ],
         post_up         => [
-            "brctl addif br-$community bat-$community",
-            "batctl -m bat-$community it 10000",
+            "brctl addif br_$community bat_$community",
+            "batctl -m bat_$community it 10000",
         ],
         pre_down        => [
-            "brctl delif br-$community bat-$community || true",
+            "brctl delif br_$community bat_$community || true",
         ],
         down            => [
-            "ip link set bat-$community down",
+            "ip link set bat_$community down",
         ],
         post_down       => [
-            "ifdown br-$community || true",
+            "ifdown br_$community || true",
         ],
         before          => Service['fastd'],
+    }
+
+    firewall { "100 mark $community traffic":
+        table           => 'mangle',
+        chain           => 'PREROUTING',
+        proto           => 'all',
+        iniface         => "br_$community",
+        jump            => 'MARK',
+        set_mark        => '0x2342/0xffffffff',
+    }
+
+    firewall { "110 allow forward $community traffic":
+        table           => 'filter',
+        chain           => 'FORWARD',
+        proto           => 'all',
+        iniface         => "br_$community",
+        source          => "$ip_address/$netmask",
+        outiface        => $forward_iface,
+        action          => accept,
+    }
+
+    firewall { "110 allow replies to forwarded $community traffic":
+        table           => 'filter',
+        chain           => 'FORWARD',
+        proto           => 'all',
+        iniface         => $forward_iface,
+        outiface        => "br_$community",
+        destination     => "$ip_address/$netmask",
+        action          => accept,
+    }
+
+    firewall { "120 masquerade $community traffic":
+        table           => 'nat',
+        chain           => 'POSTROUTING',
+        proto           => 'all',
+        source          => "$ip_address/$netmask",
+        outiface        => $forward_iface,
+        jump            => 'MASQUERADE',
     }
 
     file { "/etc/fastd/$community":
