@@ -56,7 +56,6 @@ class gluon {
     }
 
     class { 'apache':
-        apache_version  => '2.4',
         mpm_module      => 'prefork',
     }
 
