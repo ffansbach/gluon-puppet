@@ -1,0 +1,27 @@
+SET CHARSET "utf8";
+
+INSERT INTO `config` VALUES
+(1,'url_to_netmon','http://<%= @netmon_domain %>/','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(2,'community_name','Freifunk <%= @city_name %>','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(3,'community_slogan','Die freie WLAN-Community aus <%= @city_name %> • Freie Netze für alle!','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(4,'community_location_longitude','8.2284163781917','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(5,'community_location_latitude','53.14416891433','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(6,'community_location_zoom','11','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(7,'mail_sender_adress','<%= @mail_sender_address %>','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(8,'mail_sender_name','Netmon Freifunk <%= @city_name %>','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(9,'mail_sending_type','php_mail','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(10,'mail_smtp_server','','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(11,'mail_smtp_username','','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(12,'mail_smtp_password','','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(13,'mail_smtp_login_auth','','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(14,'mail_smtp_ssl','','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(15,'twitter_consumer_key','dRWT5eeIn9UiHJgcjgpPQ','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(16,'twitter_consumer_secret','QxcnltPX2sTH8E7eZlxyZeqTIVoIoRjlrmUfkCzGSA','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(17,'enable_network_policy','false','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(18,'network_policy_url','http://picopeer.net/PPA-de.html','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(19,'template','freifunk_oldenburg','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(20,'hours_to_keep_mysql_crawl_data','5','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(21,'hours_to_keep_history_table','72','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(22,'crawl_cycle_length_in_minutes','10','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(23,'event_notification_router_offline_crawl_cycles','6','2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(24,'community_essid','<%= @community_essid %>', '2014-10-05 23:55:43','0000-00-00 00:00:00');
