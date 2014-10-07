@@ -6,6 +6,15 @@ define gluon::netmon (
     $city_name              = undef,
     $community_essid        = undef,
     $mail_sender_address    = undef,
+
+    $map_lng                = 10.570568561602705,
+    $map_lat                = 49.30287809839658,
+    $map_zoom               = 13,
+
+    $admin_nickname         = undef,
+    $admin_password         = undef,
+    $admin_apikey           = undef,
+    $admin_email            = undef,
 ) {
     exec { "clone-netmon-$community":
         creates => "/srv/netmon-$community",
@@ -14,8 +23,12 @@ define gluon::netmon (
     }
 
     apache::vhost { $netmon_domain:
-        docroot     => "/srv/netmon-$community",
-        servername  => $netmon_domain,
+        ip              => '*',
+        port            => 80,
+        add_listen      => false,
+        docroot         => "/srv/netmon-$community",
+        servername      => $netmon_domain,
+        serveraliases   => [ "netmon.$community_essid" ],
     }
 
     file { "/srv/netmon-$community":
@@ -46,13 +59,18 @@ define gluon::netmon (
         content     => template("gluon/netmon-config.sql"),
     }
 
-    exec{ "netmon_$community-config":
+    exec { "netmon_$community-config":
         command     => "/usr/bin/mysql netmon_$community < /srv/netmon-$community/config/preseed.sql",
         logoutput   => true,
         environment => "HOME=${::root_home}",
         refreshonly => true,
         require     => File["/srv/netmon-$community/config/preseed.sql"],
         subscribe   => Exec["netmon_$community-import"],
-      }
+    }
 
+    cron { "crawl_$community":
+        command => "/usr/bin/php /srv/netmon-$community/cronjobs.php",
+        user    => root,
+        minute  => '*/10'
+    }
 }
