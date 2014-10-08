@@ -6,6 +6,7 @@ define gluon::mesh_vpn (
     $netmask        = '255.255.255.0',
 
     $ip6_address    = undef,
+    $ip6_prefix     = undef,
 
     $fastd_port     = 10000,
 
@@ -20,6 +21,7 @@ define gluon::mesh_vpn (
         netmask         => $netmask,
         post_up         => [
             "ip -6 a a $ip6_address/64 dev br_$community",
+            "test -d /srv/netmon-$community && ip -6 a a ${ip6_prefix}42/64 dev br_$community"
         ],
         before          => Network::Interface["bat_$community"],
     }

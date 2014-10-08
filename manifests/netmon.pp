@@ -20,6 +20,10 @@ define gluon::netmon (
         creates => "/srv/netmon-$community",
         command => "/usr/bin/git clone http://git.freifunk-ol.de/root/netmon.git netmon-$community",
         cwd     => "/srv",
+
+        # kind of a hack, this provides feedback to the network interface post-up
+        # code, which provides a netmon ip address, if netmon is used.
+        before  => Network::Interface["br_$community"],
     }
 
     apache::vhost { $netmon_domain:
