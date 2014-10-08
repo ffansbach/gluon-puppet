@@ -11,6 +11,7 @@ define gluon::mesh_vpn (
     $fastd_port     = 10000,
 
     $forward_iface  = false,
+    $forward_accept = [],
 ) {
     include gluon
 
@@ -55,7 +56,7 @@ define gluon::mesh_vpn (
         before          => Service['fastd'],
     }
 
-    firewall { "100 mark $community traffic":
+    firewall { "200 mark $community traffic":
         table           => 'mangle',
         chain           => 'PREROUTING',
         proto           => 'all',
@@ -93,6 +94,11 @@ define gluon::mesh_vpn (
         jump            => 'MASQUERADE',
     }
 
+    mesh_forward { $forward_accept:
+        community       => $community,
+        mesh_net        => "$ip_address/$netmask",
+    }
+
     file { "/etc/fastd/$community":
         ensure      => directory,
         require     => Package['fastd'],
@@ -127,5 +133,46 @@ define gluon::mesh_vpn (
     concat::fragment { "radvd-$community":
         target      => "/etc/radvd.conf",
         content     => template('gluon/radvd.conf'),
+    }
+}
+
+
+define mesh_forward ($community, $mesh_net) {
+    firewall { "100 accept $community traffic to $name":
+        table           => 'mangle',
+        chain           => 'PREROUTING',
+        proto           => 'all',
+        iniface         => "br_$community",
+        destination     => $name,
+        action          => accept,
+    }
+
+    firewall { "110 allow forward $community traffic to $name":
+        table           => 'filter',
+        chain           => 'FORWARD',
+        proto           => 'all',
+        iniface         => "br_$community",
+        source          => $mesh_net,
+        destination     => $name,
+        action          => accept,
+    }
+
+    firewall { "110 allow replies to forwarded $community traffic to $name":
+        table           => 'filter',
+        chain           => 'FORWARD',
+        proto           => 'all',
+        source          => $name,
+        outiface        => "br_$community",
+        destination     => $mesh_net,
+        action          => accept,
+    }
+
+    firewall { "120 masquerade $community traffic to $name":
+        table           => 'nat',
+        chain           => 'POSTROUTING',
+        proto           => 'all',
+        source          => $mesh_net,
+        destination     => $name,
+        jump            => 'MASQUERADE',
     }
 }
