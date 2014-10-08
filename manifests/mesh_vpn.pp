@@ -122,4 +122,8 @@ define gluon::mesh_vpn (
         before      => Service['fastd'],
     }
 
+    concat::fragment { "radvd-$community":
+        target      => "/etc/radvd.conf",
+        content     => template('gluon/radvd.conf'),
+    }
 }

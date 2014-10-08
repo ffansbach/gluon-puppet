@@ -95,4 +95,18 @@ class gluon {
         source      => 'puppet:///modules/gluon/rc.local',
         mode        => 0755,
     }
+
+    package { 'radvd':
+        ensure      => present,
+    }
+
+    concat { '/etc/radvd.conf':
+        ensure      => present,
+        notify      => Service['radvd'],
+    }
+
+    service { 'radvd':
+        ensure      => running,
+        require     => Package['radvd'],
+    }
 }
