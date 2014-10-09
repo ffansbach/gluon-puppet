@@ -15,6 +15,13 @@ define gluon::netmon (
     $admin_password         = undef,
     $admin_apikey           = undef,
     $admin_email            = undef,
+
+    $ssl                    = false,
+    $ssl_cert               = $::apache::default_ssl_cert,
+    $ssl_key                = $::apache::default_ssl_key,
+    $ssl_chain              = $::apache::default_ssl_chain,
+    $ssl_ca                 = $::apache::default_ssl_ca,
+
 ) {
     exec { "clone-netmon-$community":
         creates => "/srv/netmon-$community",
@@ -33,6 +40,22 @@ define gluon::netmon (
         docroot         => "/srv/netmon-$community",
         servername      => $netmon_domain,
         serveraliases   => [ "netmon.$community_essid" ],
+    }
+
+    if $ssl {
+        apache::vhost { "$netmon_domain-ssl":
+            ip              => '*',
+            port            => 443,
+            ssl		    => true,
+            docroot         => "/srv/netmon-$community",
+            servername      => $netmon_domain,
+            serveraliases   => [ "netmon.$community_essid" ],
+
+            ssl_cert        => $ssl_cert,
+            ssl_key         => $ssl_key,
+            ssl_chain       => $ssl_chain,
+            ssl_ca          => $ssl_ca,
+        }
     }
 
     file { "/srv/netmon-$community":
