@@ -109,4 +109,8 @@ class gluon {
         ensure      => running,
         require     => Package['radvd'],
     }
+
+    group { 'freifunker':
+        ensure      => present,
+    }
 }

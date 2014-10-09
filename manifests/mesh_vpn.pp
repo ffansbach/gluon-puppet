@@ -106,6 +106,8 @@ define gluon::mesh_vpn (
 
     file { "/etc/fastd/$community/peers":
         ensure      => directory,
+        group       => 'freifunker',
+        mode        => 775,
     }
 
     exec { "/root/fastd-$community-key.txt":
