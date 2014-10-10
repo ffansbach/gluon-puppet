@@ -4,8 +4,8 @@
 #
 # Parameters:
 # - The $community name
-# - The $ip_address of this gateway within the Mesh network
-# - The $netmask wrt. $ip_address
+# - The $ip4_address of this gateway within the Mesh network
+# - The $ip4_netmask wrt. $ip4_address
 # - The $ip6_address of this gateway within the Mesh network; /64 mask is assumed
 # - The $ip6_prefix of the Mesh network with trailing double colons
 # - The $fastd_port to configure fastd to listen on
@@ -23,9 +23,8 @@
 #  gluon::mesh_vpn { 'ffan':
 #      ip6_address     => '2001:470:5168::2',
 #      ip6_prefix      => '2001:470:5168::',
-#      ip_address      => '10.123.1.2',
-#      netmask         => '255.255.255.0',
-# 
+#      ip4_address     => '10.123.1.2',
+#      ip4_netmask     => '255.255.255.0',
 #      forward_iface   => 'tun+',
 #      forward_accept  => [ '176.9.120.153/32', '176.9.129.236/32' ],
 #  }
@@ -34,8 +33,8 @@ define gluon::mesh_vpn (
     $ensure         = 'present',
     $community      = $name,
 
-    $ip_address     = undef,
-    $netmask        = '255.255.255.0',
+    $ip4_address    = undef,
+    $ip4_netmask    = '255.255.255.0',
 
     $ip6_address    = undef,
     $ip6_prefix     = undef,
@@ -54,8 +53,8 @@ define gluon::mesh_vpn (
     network::interface { "br_$community":
         auto            => false,
         bridge_ports    => 'none',
-        ipaddress       => $ip_address,
-        netmask         => $netmask,
+        ipaddress       => $ip4_address,
+        netmask         => $ip4_netmask,
         post_up         => [
             "ip -6 a a $ip6_address/64 dev br_$community",
             "test -d /srv/netmon-$community && ip -6 a a ${ip6_prefix}42/64 dev br_$community"
@@ -114,7 +113,7 @@ define gluon::mesh_vpn (
         chain           => 'FORWARD',
         proto           => 'all',
         iniface         => "br_$community",
-        source          => "$ip_address/$netmask",
+        source          => "$ip4_address/$ip4_netmask",
         outiface        => $forward_iface,
         action          => accept,
     }
@@ -125,7 +124,7 @@ define gluon::mesh_vpn (
         proto           => 'all',
         iniface         => $forward_iface,
         outiface        => "br_$community",
-        destination     => "$ip_address/$netmask",
+        destination     => "$ip4_address/$ip4_netmask",
         action          => accept,
     }
 
@@ -134,7 +133,7 @@ define gluon::mesh_vpn (
         table           => 'nat',
         chain           => 'POSTROUTING',
         proto           => 'all',
-        source          => "$ip_address/$netmask",
+        source          => "$ip4_address/$ip4_netmask",
         outiface        => $forward_iface,
         jump            => 'MASQUERADE',
     }
@@ -143,7 +142,7 @@ define gluon::mesh_vpn (
     # according to $forward_accept parameter.
     mesh_forward { $forward_accept:
         community       => $community,
-        mesh_net        => "$ip_address/$netmask",
+        mesh_net        => "$ip4_address/$ip4_netmask",
     }
 
 
