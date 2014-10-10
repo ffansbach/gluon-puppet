@@ -1,16 +1,12 @@
+# Definition: gluon
+#
+# This class prepares the node for installation of one (ore more) Mesh VPN servers
+#
+# You usually don't need to declare/include this class directly,
+# just declare gluon::mesh_vpn instances and it will include this class as needed.
+#
 class gluon {
-    package { 'bridge-utils':
-        ensure => present,
-    }
-
-    sysctl { 'net.ipv4.ip_forward':
-        value => '1'
-    }
-
-    sysctl { 'net.ipv6.conf.all.forwarding':
-        value => '1'
-    }
-
+    # include universe_factory apt repository for batman & fastd packages
     apt::key { 'universe_factory':
         key         => '16EF3F64CB201D9C',
         key_server  => 'pgp.mit.edu',
@@ -24,58 +20,29 @@ class gluon {
         require     => Apt::Key['universe_factory'],
     }
 
-    package { 'batman-adv-dkms':
-        ensure      => present,
-        require     => Apt::Source['universe_factory'],
+    include "gluon::batman"
+
+
+    # install bridge-utils to configure bridge interface wrapping batman device
+    package { 'bridge-utils':
+        ensure => present,
     }
 
-    package { 'batctl':
-        ensure      => present,
-        require     => Apt::Source['universe_factory'],
+
+    # configure ip forwarding for IPv4 & IPv6
+    sysctl { 'net.ipv4.ip_forward':
+        value => '1'
     }
 
-    file { '/usr/local/sbin/install-batman-adv':
-        ensure      => present,
-        source      => 'puppet:///modules/gluon/install-batman-adv',
-        mode        => 0755,
+    sysctl { 'net.ipv6.conf.all.forwarding':
+        value => '1'
     }
 
-    exec { 'install-batman-adv':
-        command     => '/usr/local/sbin/install-batman-adv',
-        unless      => '/usr/bin/test -f "/root/batman-adv-`uname -r`.stamp"',
-        require     => File['/usr/local/sbin/install-batman-adv'],
-    }
 
-    kmod::load { 'batman-adv':
-        require     => Exec['install-batman-adv'],
-    }
-
+    # install fastd vpn service
     package { 'fastd':
         ensure      => 'present',
         require     => Apt::Source['universe_factory'],
-    }
-
-    class { 'apache':
-        mpm_module      => 'prefork',
-    }
-
-    class { 'apache::mod::php':
-    }
-
-    package { 'dnsmasq':
-        ensure      => present,
-    }
-
-    package { [ 'php5-mysql', 'php5-gmp', 'php5-curl', 'php5-gd' ]:
-        ensure  => present,
-    }
-
-    package { 'rrdtool':
-        ensure  => present,
-    }
-
-    package { 'exim4':
-        ensure  => present,
     }
 
     service { 'fastd':
@@ -84,18 +51,60 @@ class gluon {
         require     => Package['fastd'],
     }
 
+    # seperate group for peers folders so people can add files there
+    group { 'freifunker':
+        ensure      => present,
+    }
+
+
+    # install dnsmasq dns/dhcp server
+    package { 'dnsmasq':
+        ensure      => present,
+    }
+
     service { 'dnsmasq':
         ensure      => running,
         enable      => true,
         require     => [ Package['dnsmasq'] ],
     }
 
+
+    # install apache & php stack
+    class { 'apache':
+        mpm_module      => 'prefork',
+    }
+
+    class { 'apache::mod::php':
+    }
+
+    package { [ 'php5-mysql', 'php5-gmp', 'php5-curl', 'php5-gd' ]:
+        ensure  => present,
+    }
+
+
+    # netmon needs rrdtool
+    package { 'rrdtool':
+        ensure  => present,
+    }
+
+
+    # netmon needs a mail transfer agent
+    package { 'exim4':
+        ensure  => present,
+    }
+
+
+    # configure policy based routing
+    # FIXME shouldn't overwrite /etc/rc.local
     file { '/etc/rc.local':
         ensure      => present,
         source      => 'puppet:///modules/gluon/rc.local',
         mode        => 0755,
     }
 
+
+    # install radvd and prepare config collection
+    # snippets for /etc/radvd.conf provided by gluon::mesh_vpn
     package { 'radvd':
         ensure      => present,
     }
@@ -108,9 +117,5 @@ class gluon {
     service { 'radvd':
         ensure      => running,
         require     => Package['radvd'],
-    }
-
-    group { 'freifunker':
-        ensure      => present,
     }
 }
