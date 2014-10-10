@@ -1,3 +1,35 @@
+# Definition: gluon::mesh_vpn
+#
+# This class installs a Mesh VPN server
+#
+# Parameters:
+# - The $community name
+# - The $ip_address of this gateway within the Mesh network
+# - The $netmask wrt. $ip_address
+# - The $ip6_address of this gateway within the Mesh network; /64 mask is assumed
+# - The $ip6_prefix of the Mesh network with trailing double colons
+# - The $fastd_port to configure fastd to listen on
+# - The $forward_iface to which to forward all traffic; i.e. the tun device of your VPN
+# - The $forward_accept list of IPv4 addresses to which to route without using the VPN
+#
+# Actions:
+# - Install a Freifunk Mesh VPN server
+#
+# Requires:
+# - The gluon class
+#
+# Sample Usage:
+#
+#  gluon::mesh_vpn { 'ffan':
+#      ip6_address     => '2001:470:5168::2',
+#      ip6_prefix      => '2001:470:5168::',
+#      ip_address      => '10.123.1.2',
+#      netmask         => '255.255.255.0',
+# 
+#      forward_iface   => 'tun+',
+#      forward_accept  => [ '176.9.120.153/32', '176.9.129.236/32' ],
+#  }
+#
 define gluon::mesh_vpn (
     $ensure         = 'present',
     $community      = $name,
@@ -15,6 +47,10 @@ define gluon::mesh_vpn (
 ) {
     include gluon
 
+
+    # needed network interfaces
+    #  - a batman device for the community
+    #  - a bridge, which wraps the batman device
     network::interface { "br_$community":
         auto            => false,
         bridge_ports    => 'none',
@@ -56,6 +92,13 @@ define gluon::mesh_vpn (
         before          => Service['fastd'],
     }
 
+
+    #
+    # firewalling rules
+    #
+
+    # mark any traffic from the mesh to the internet with 0x2342;
+    # used for policy based routing (to either tor or vpn) later on
     firewall { "200 mark $community traffic":
         table           => 'mangle',
         chain           => 'PREROUTING',
@@ -65,6 +108,7 @@ define gluon::mesh_vpn (
         set_mark        => '0x2342/0xffffffff',
     }
 
+    # ... and allow passing the traffic back and forth through forwarding filter
     firewall { "110 allow forward $community traffic":
         table           => 'filter',
         chain           => 'FORWARD',
@@ -85,6 +129,7 @@ define gluon::mesh_vpn (
         action          => accept,
     }
 
+    # last not least masquerade outgoing traffic
     firewall { "120 masquerade $community traffic":
         table           => 'nat',
         chain           => 'POSTROUTING',
@@ -94,11 +139,18 @@ define gluon::mesh_vpn (
         jump            => 'MASQUERADE',
     }
 
+    # special exception is traffic that may be routed directly,
+    # according to $forward_accept parameter.
     mesh_forward { $forward_accept:
         community       => $community,
         mesh_net        => "$ip_address/$netmask",
     }
 
+
+
+    #
+    # configure fastd instance
+    #
     file { "/etc/fastd/$community":
         ensure      => directory,
         require     => Package['fastd'],
@@ -132,6 +184,11 @@ define gluon::mesh_vpn (
         before      => Service['fastd'],
     }
 
+
+    #
+    # configure ipv6 router advertising daemon
+    # FIXME probably should be possible to be disabled
+    #
     concat::fragment { "radvd-$community":
         target      => "/etc/radvd.conf",
         content     => template('gluon/radvd.conf'),
@@ -139,6 +196,9 @@ define gluon::mesh_vpn (
 }
 
 
+
+# helper definition to map $forward_accept array of gluon::mesh_vpn type
+# should *not* be used directly from external manifests
 define mesh_forward ($community, $mesh_net) {
     firewall { "100 accept $community traffic to $name":
         table           => 'mangle',
