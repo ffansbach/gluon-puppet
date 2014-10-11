@@ -28,7 +28,15 @@ define gluon::site_config (
     #}
 
     file { "/srv/gluon-$community/":
-        ensure      => directory
+        ensure      => directory,
+        group       => "freifunker",
+        mode        => 775,
+    }
+
+    file { "/srv/gluon-$community/autogen.sh":
+        ensure      => present,
+        content     => template('gluon/autogen.sh'),
+        mode        => 755,
     }
 
     file { "/srv/gluon-$community/site/":
