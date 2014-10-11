@@ -40,6 +40,7 @@ define gluon::site_config (
         content     => template('gluon/site.conf'),
         mode        => 755,
         notify      => Exec["/srv/gluon-$community/site/site.conf"],
+        require     => Exec["/root/fastd-$community-key.txt"],
     }
 
     exec { "/srv/gluon-$community/site/site.conf":
