@@ -11,6 +11,9 @@
 # - The $fastd_port to configure fastd to listen on
 # - The $forward_iface to which to forward all traffic; i.e. the tun device of your VPN
 # - The $forward_accept list of IPv4 addresses to which to route without using the VPN
+# - The $site_config option, whether to provide a gluon site directory
+# - The $city_name to use throughout site/site.conf
+# - The $auto_update_pubkey to list in the gluon site/site.conf
 #
 # Actions:
 # - Install a Freifunk Mesh VPN server
@@ -30,19 +33,23 @@
 #  }
 #
 define gluon::mesh_vpn (
-    $ensure         = 'present',
-    $community      = $name,
+    $ensure             = 'present',
+    $community          = $name,
+    $city_name          = undef,
 
-    $ip4_address    = undef,
-    $ip4_netmask    = '255.255.255.0',
+    $ip4_address        = undef,
+    $ip4_netmask        = '255.255.255.0',
 
-    $ip6_address    = undef,
-    $ip6_prefix     = undef,
+    $ip6_address        = undef,
+    $ip6_prefix         = undef,
 
-    $fastd_port     = 10000,
+    $fastd_port         = 10000,
 
-    $forward_iface  = false,
-    $forward_accept = [],
+    $forward_iface      = false,
+    $forward_accept     = [],
+
+    $site_config        = true,
+    $auto_update_pubkey = undef,
 ) {
     include gluon
 
@@ -191,6 +198,20 @@ define gluon::mesh_vpn (
     concat::fragment { "radvd-$community":
         target      => "/etc/radvd.conf",
         content     => template('gluon/radvd.conf'),
+    }
+
+
+    if $site_config {
+        gluon::site_config { $name:
+            city_name           => $city_name,
+            ip4_address         => $ip4_address,
+            ip4_netmask         => $ip4_netmask,
+            ip6_prefix          => $ip6_prefix,
+            ntp_server          => $ip6_address,
+            fastd_port          => $fastd_port,
+            auto_update_server  => $ip6_address,
+            auto_update_pubkey  => $auto_update_pubkey,
+        }
     }
 }
 

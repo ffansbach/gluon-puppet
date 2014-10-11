@@ -1,0 +1,4 @@
+GLUON_SITE_FEEDS='ffol'
+
+PACKAGES_FFOL_REPO=https://github.com/ffansbach/gluon-packages.git
+PACKAGES_FFOL_COMMIT=1304663fc7aa8faa89d8a16a8ce438f07c17f453
