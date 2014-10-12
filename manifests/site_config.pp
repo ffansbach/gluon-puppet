@@ -1,38 +1,34 @@
 define gluon::site_config (
-    $ensure         = 'present',
-    $community      = $name,
+    $ensure                 = 'present',
+    $community              = $name,
 
-    $city_name      = undef,
+    $city_name              = undef,
+    $site_domain            = "site.freifunk-$city_name.de",
+    $community_domain       = "freifunk-$city_name.de",
 
-    $ip4_address    = undef,
-    $ip4_netmask    = undef,
-    $ip6_prefix     = undef,
+    $ip4_address            = undef,
+    $ip4_netmask            = undef,
+    $ip6_prefix             = undef,
 
-    $ntp_server     = undef,
-    $fastd_port     = undef,
+    $ntp_server             = undef,
+    $fastd_port             = undef,
 
-    $site_name      = "Freifunk $city_name",
-    $ssid           = "$city_name.freifunk.net",
-    $mesh_ssid      = "mesh.$city_name.freifunk.net",
-    $gateway_ipaddr = $ipaddress_eth0,
+    $site_name              = "Freifunk $city_name",
+    $ssid                   = "$city_name.freifunk.net",
+    $mesh_ssid              = "mesh.$city_name.freifunk.net",
+    $gateway_ipaddr         = $ipaddress_eth0,
 
-    $auto_update_server = undef,
-    $auto_update_pubkey = undef,
+    $ssl                    = false,
+    $ssl_cert               = $::apache::default_ssl_cert,
+    $ssl_key                = $::apache::default_ssl_key,
+    $ssl_chain              = $::apache::default_ssl_chain,
+    $ssl_ca                 = $::apache::default_ssl_ca,
 
-    $reg_email_addr     = "key@freifunk-$city_name.de",
-    $reg_form_url       = "https://site.freifunk-$city_name.de/router-anmelden/",
-    $community_url      = "https://freifunk-$city_name.de/",
+    $auto_update_pubkey     = undef,
+    $reg_email_addr         = "key@freifunk-$city_name.de",
+
+    $community_url          = "https://freifunk-$city_name.de/",
 ) {
-    #if $city_name and !$site_name {
-    #    $site_name = "Freifunk $city_name"
-    #}
-
-    file { "/srv/gluon-$community/":
-        ensure      => directory,
-        group       => "freifunker",
-        mode        => 775,
-    }
-
     file { "/srv/gluon-$community/autogen.sh":
         ensure      => present,
         content     => template('gluon/autogen.sh'),
@@ -65,5 +61,34 @@ define gluon::site_config (
     file { "/srv/gluon-$community/site/modules":
         ensure      => present,
         source      => "puppet:///modules/gluon/modules",
+    }
+
+    apache::vhost { $site_domain:
+        ip              => '*',
+        port            => 80,
+        add_listen      => false,
+        docroot         => "/srv/gluon-$community",
+        servername      => $site_domain,
+
+        docroot_group   => "freifunker",
+        docroot_mode    => 775,
+    }
+
+    if $ssl {
+        apache::vhost { "$site_domain-ssl":
+            ip              => '*',
+            port            => 443,
+            ssl             => true,
+            docroot         => "/srv/gluon-$community",
+            servername      => $site_domain,
+
+            docroot_group   => "freifunker",
+            docroot_mode    => 775,
+
+            ssl_cert        => $ssl_cert,
+            ssl_key         => $ssl_key,
+            ssl_chain       => $ssl_chain,
+            ssl_ca          => $ssl_ca,
+        }
     }
 }

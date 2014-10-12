@@ -209,7 +209,6 @@ define gluon::mesh_vpn (
             ip6_prefix          => $ip6_prefix,
             ntp_server          => $ip6_address,
             fastd_port          => $fastd_port,
-            auto_update_server  => $ip6_address,
             auto_update_pubkey  => $auto_update_pubkey,
         }
     }
