@@ -118,4 +118,10 @@ class gluon {
         ensure      => running,
         require     => Package['radvd'],
     }
+
+
+    # install ntp service
+    package { 'ntp':
+        ensure      => present,
+    }
 }
