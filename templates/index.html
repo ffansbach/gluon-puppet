@@ -1,0 +1,17 @@
+<html>
+<body>
+<h1><%= @site_domain.downcase %></h1>
+
+<p>
+  This site hosts gluon site configuration and pre-compiled images for
+  the Freifunk community of <%= @city_name %>.
+</p>
+
+<ul>
+  <li><a href="/site/">site configuration files</a> (in case you want to compile the firmware by yourself)</li>
+  <li><a href="/images/">precompiled images</a> ready to be flashed.
+    Pick a factory image, if you're initially flashing your device.
+    Otherwise pick the sysupgrade image.</li>
+</ul>
+</body>
+</html>
