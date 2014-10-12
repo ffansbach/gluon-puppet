@@ -72,6 +72,13 @@ class gluon {
     # install apache & php stack
     class { 'apache':
         mpm_module      => 'prefork',
+        manage_user     => false,
+    }
+
+    user { 'www-data':
+        ensure          => present,
+        groups          => [ 'freifunker' ],
+        require         => Group['freifunker'],
     }
 
     class { 'apache::mod::php':

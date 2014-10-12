@@ -42,11 +42,6 @@ define gluon::site_config (
         mode        => 755,
     }
 
-    file { "/srv/site-$community/index.html":
-        ensure      => present,
-        content     => template('gluon/index.html'),
-    }
-
     file { "/srv/gluon-$community/site/":
         ensure      => directory
     }
@@ -73,6 +68,34 @@ define gluon::site_config (
     file { "/srv/gluon-$community/site/modules":
         ensure      => present,
         source      => "puppet:///modules/gluon/modules",
+    }
+
+    file { "/srv/site-$community":
+        source      => "puppet:///modules/gluon/site-wwwroot",
+        recurse     => true,
+    }
+
+    file { "/srv/site-$community/index.html":
+        ensure      => present,
+        content     => template('gluon/index.html'),
+    }
+
+    file { "/srv/site-$community/router-anmelden/index.php":
+        content     => template('gluon/site-wwwroot/index.php'),
+    }
+
+    file { "/srv/site-$community/router-anmelden/kill-helper":
+        content     => template('gluon/site-wwwroot/kill-helper'),
+        mode        => 755,
+    }
+
+    file { "/srv/site-$community/api/node.php":
+        content     => template('gluon/site-wwwroot/node.php'),
+    }
+
+    file_line { "sudo-fastd-$community":
+        path        => '/etc/sudoers',
+        line        => "%freifunker ALL=(root) NOPASSWD: /srv/site-$community/router-anmelden/kill-helper",
     }
 
     $directories = [
