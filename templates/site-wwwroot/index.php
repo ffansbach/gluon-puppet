@@ -110,6 +110,18 @@
     <div class="container">
         <h1>Knoten anmelden</h1>
 
+        <p>
+          Du hast deinen Router erfolgreich mit der Freifunk <%= @city_name %>
+          Firmware geflashed und möchtest ihn nun über das Internet mit dem
+          Freifunknetz verbinden?  Dann trage bitte den Namen deines Routers und
+          den VPN-Key (beides wurde dir nach dem Einrichten des Routers
+          angezeigt) in das folgende Formular ein.
+        </p>
+
+        <p>
+          Nach dem Eintragen verbindet sich der Router innerhalb der nächsten 5 Minuten mit dem Freifunknetz.
+        </p>
+
         <div class="container well">
             <noscript>
                 <div class="alert alert-danger">
