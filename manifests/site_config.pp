@@ -8,6 +8,7 @@ define gluon::site_config (
 
     $ip4_address            = undef,
     $ip4_netmask            = undef,
+    $ip6_address            = undef,
     $ip6_prefix             = undef,
 
     $ntp_server             = undef,
@@ -29,10 +30,21 @@ define gluon::site_config (
 
     $community_url          = "https://freifunk-$city_name.de/",
 ) {
+    file { "/srv/gluon-$community":
+        ensure      => directory,
+        group       => "freifunker",
+        mode        => 775,
+    }
+
     file { "/srv/gluon-$community/autogen.sh":
         ensure      => present,
         content     => template('gluon/autogen.sh'),
         mode        => 755,
+    }
+
+    file { "/srv/site-$community/index.html":
+        ensure      => present,
+        content     => template('gluon/index.html'),
     }
 
     file { "/srv/gluon-$community/site/":
@@ -63,32 +75,76 @@ define gluon::site_config (
         source      => "puppet:///modules/gluon/modules",
     }
 
-    apache::vhost { $site_domain:
-        ip              => '*',
+    $directories = [
+        {
+            provider       => 'directory',
+            path           => "/srv/site-$community",
+            options        => ['Indexes','FollowSymLinks','MultiViews'],
+            allow_override => 'None',
+            directoryindex => '',
+        },
+        {
+            provider       => 'directory',
+            path           => "/srv/gluon-$community/site",
+            options        => ['Indexes','FollowSymLinks','MultiViews'],
+            allow_override => 'None',
+            directoryindex => '',
+        },
+        {
+            provider       => 'directory',
+            path           => "/srv/gluon-$community/images",
+            options        => ['Indexes','FollowSymLinks','MultiViews'],
+            allow_override => 'None',
+            directoryindex => '',
+        },
+    ]
+
+    apache::vhost { $ip6_address:
+        ip              => $ip6_address,
+        servername      => $ip6_address,
         port            => 80,
         add_listen      => false,
-        docroot         => "/srv/gluon-$community",
-        servername      => $site_domain,
+        docroot         => "/srv/site-$community",
 
-        docroot_group   => "freifunker",
-        docroot_mode    => 775,
+        aliases         => [
+            { alias => "/site/", path => "/srv/gluon-$community/site/" },
+            { alias => "/images/", path => "/srv/gluon-$community/images/" },
+        ],
+        directories     => $directories,
+    }
+
+    apache::vhost { $site_domain:
+        ip              => '*',
+        servername      => $site_domain,
+        port            => 80,
+        add_listen      => false,
+        docroot         => "/srv/site-$community",
+
+        aliases         => [
+            { alias => "/site/", path => "/srv/gluon-$community/site/" },
+            { alias => "/images/", path => "/srv/gluon-$community/images/" },
+        ],
+        directories     => $directories,
     }
 
     if $ssl {
         apache::vhost { "$site_domain-ssl":
             ip              => '*',
+            servername      => $site_domain,
             port            => 443,
             ssl             => true,
-            docroot         => "/srv/gluon-$community",
-            servername      => $site_domain,
-
-            docroot_group   => "freifunker",
-            docroot_mode    => 775,
+            docroot         => "/srv/site-$community",
 
             ssl_cert        => $ssl_cert,
             ssl_key         => $ssl_key,
             ssl_chain       => $ssl_chain,
             ssl_ca          => $ssl_ca,
+
+            aliases         => [
+                { alias => "/site/", path => "/srv/gluon-$community/site/" },
+                { alias => "/images/", path => "/srv/gluon-$community/images/" },
+            ],
+            directories     => $directories,
         }
     }
 }

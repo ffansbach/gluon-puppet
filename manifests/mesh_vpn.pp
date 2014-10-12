@@ -14,6 +14,8 @@
 # - The $site_config option, whether to provide a gluon site directory
 # - The $city_name to use throughout site/site.conf
 # - The $auto_update_pubkey to list in the gluon site/site.conf
+# - The $auto_update_seckey_file which contains the secret key to $auto_update_pubkey,
+#       used to automatically sign sysupgrade manifest.  Leave empty to sign manually.
 #
 # Actions:
 # - Install a Freifunk Mesh VPN server
@@ -48,8 +50,9 @@ define gluon::mesh_vpn (
     $forward_iface      = false,
     $forward_accept     = [],
 
-    $site_config        = true,
-    $auto_update_pubkey = undef,
+    $site_config                = true,
+    $auto_update_pubkey         = undef,
+    $auto_update_seckey_file    = undef,
 ) {
     include gluon
 
@@ -206,6 +209,7 @@ define gluon::mesh_vpn (
             city_name           => $city_name,
             ip4_address         => $ip4_address,
             ip4_netmask         => $ip4_netmask,
+            ip6_address         => $ip6_address,
             ip6_prefix          => $ip6_prefix,
             ntp_server          => $ip6_address,
             fastd_port          => $fastd_port,
