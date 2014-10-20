@@ -13,6 +13,8 @@
 # - The $forward_accept list of IPv4 addresses to which to route without using the VPN
 # - The $site_config option, whether to provide a gluon site directory
 # - The $city_name to use throughout site/site.conf
+# - The $github_repo to sync peers files to and from
+# - The $github_owner of the repo.
 # - The $auto_update_pubkey to list in the gluon site/site.conf
 # - The $auto_update_seckey_file which contains the secret key to $auto_update_pubkey,
 #       used to automatically sign sysupgrade manifest.  Leave empty to sign manually.
@@ -49,6 +51,9 @@ define gluon::mesh_vpn (
 
     $forward_iface      = false,
     $forward_accept     = [],
+
+    $github_owner       = undef,
+    $github_repo        = undef,
 
     $site_config                = true,
     $auto_update_pubkey         = undef,
@@ -215,6 +220,43 @@ define gluon::mesh_vpn (
             fastd_port          => $fastd_port,
             auto_update_pubkey  => $auto_update_pubkey,
         }
+    }
+
+
+    if $github_owner and $github_repo {
+        exec { "/etc/fastd/$community/peers/.git":
+            command     => "/usr/bin/git init-db",
+            cwd         => "/etc/fastd/$community/peers",
+            creates     => "/etc/fastd/$community/peers/.git",
+            require     => File["/etc/fastd/$community/peers"],
+            user        => "freifunker",
+        }
+
+        exec { "/etc/fastd/$community/peers/.git/origin":
+            command     => "git remote rm origin; git remote add origin 'git@github.com:$github_owner/$github_repo.git'",
+            cwd         => "/etc/fastd/$community/peers",
+            path        => "/usr/bin:/bin",
+            unless      => "test \"`git remote show -n origin | sed -n '/Fetch URL/ { s/.*: //; p }'`\" = 'git@github.com:$github_owner/$github_repo.git'",
+            require     => Exec["/etc/fastd/$community/peers/.git"],
+            user        => "freifunker",
+        }
+
+        cron { "sync_push_$community":
+            command => "cd /etc/fastd/$community/peers/; \
+                git pull --rebase origin master; \
+                export GIT_AUTHOR_NAME=\"Gluon Gateway Robot\"; \
+                export GIT_AUTHOR_EMAIL=\"freifunker@`hostname -f`\"; \
+                export GIT_COMMITTER_NAME=\"Gluon Gateway Robot\"; \
+                export GIT_COMMITTER_EMAIL=\"freifunker@`hostname -f`\"; \
+                if test `git status --porcelain | wc -l` -gt 0; then \
+                    git add .; \
+                    git commit -m 'auto-commit'; \
+                    git push origin master; \
+                fi",
+            user    => "freifunker",
+            minute  => "*/15",
+        }
+
     }
 }
 

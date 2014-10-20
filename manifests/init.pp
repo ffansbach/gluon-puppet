@@ -56,6 +56,38 @@ class gluon {
         ensure      => present,
     }
 
+    user { 'freifunker':
+        ensure      => present,
+        gid         => 'freifunker',
+        managehome  => true,
+    }
+
+    file { "/home/freifunker":
+        ensure      => directory,
+        owner       => "freifunker",
+        group       => "freifunker",
+    }
+
+    file { "/home/freifunker/.ssh/":
+        ensure      => directory,
+        owner       => "freifunker",
+        group       => "freifunker",
+    }
+
+    file { "/home/freifunker/.ssh/known_hosts":
+        ensure      => present,
+        content     => "|1|IwcxiCc7BkaDcmD9L1wTFum+naM=|ROZQO+Mse4jREuOfXGZ8RnKXnEo= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n",
+        replace     => false,
+        owner       => "freifunker",
+        group       => "freifunker",
+    }
+
+    exec { "freifunker-ssh-key":
+        command     => "/usr/bin/ssh-keygen -qf /home/freifunker/.ssh/id_rsa -N ''",
+        creates     => "/home/freifunker/.ssh/id_rsa",
+        user        => "freifunker",
+        environment => "HOME=/home/freifunker/",
+    }
 
     # install dnsmasq dns/dhcp server
     package { 'dnsmasq':
