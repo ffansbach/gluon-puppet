@@ -15,6 +15,7 @@
 # - The $city_name to use throughout site/site.conf
 # - The $dhcp_range_start and $dhcp_range_end
 # - The $dhcp_leasetime
+# - The $gateway_ipaddr of this gateway (used by other nodes to connect to here)
 # - The $github_repo to sync peers files to and from
 # - The $github_owner of the repo.
 # - The $auto_update_pubkey to list in the gluon site/site.conf
@@ -60,6 +61,8 @@ define gluon::mesh_vpn (
 
     $github_owner       = undef,
     $github_repo        = undef,
+
+    $gateway_ipaddr     = $ipaddress_eth0,
 
     $site_config                = true,
     $auto_update_pubkey         = undef,
@@ -250,7 +253,7 @@ define gluon::mesh_vpn (
         }
 
         exec { "/etc/fastd/$community/peers/$hostname":
-            command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";/; p }' /root/fastd-ffan-key.txt > /etc/fastd/$community/peers/$hostname",
+            command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";\\nremote $gateway_ipaddr:$fastd_port;/; p }' /root/fastd-$community-key.txt > /etc/fastd/$community/peers/$hostname",
             creates     => "/etc/fastd/$community/peers/$hostname",
             require     => Exec["/root/fastd-$community-key.txt"],
         }
