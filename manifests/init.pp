@@ -106,38 +106,6 @@ class gluon {
     }
 
 
-    # install apache & php stack
-    class { 'apache':
-        mpm_module      => 'prefork',
-        manage_user     => false,
-    }
-
-    user { 'www-data':
-        ensure          => present,
-        groups          => [ 'freifunker' ],
-        require         => Group['freifunker'],
-    }
-
-    class { 'apache::mod::php':
-    }
-
-    package { [ 'php5-mysql', 'php5-gmp', 'php5-curl', 'php5-gd' ]:
-        ensure  => present,
-    }
-
-
-    # netmon needs rrdtool
-    package { 'rrdtool':
-        ensure  => present,
-    }
-
-
-    # netmon needs a mail transfer agent
-    package { 'exim4':
-        ensure  => present,
-    }
-
-
     # configure policy based routing
     # FIXME shouldn't overwrite /etc/rc.local
     file { '/etc/rc.local':

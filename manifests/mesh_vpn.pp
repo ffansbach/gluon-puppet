@@ -216,6 +216,8 @@ define gluon::mesh_vpn (
 
 
     if $site_config {
+        include gluon::apache_common
+
         gluon::site_config { $name:
             city_name           => $city_name,
             ip4_address         => $ip4_address,

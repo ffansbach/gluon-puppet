@@ -23,6 +23,8 @@ define gluon::netmon (
     $ssl_ca                 = $::apache::default_ssl_ca,
 
 ) {
+    include gluon::netmon_common
+
     exec { "clone-netmon-$community":
         creates => "/srv/netmon-$community",
         command => "/usr/bin/git clone http://git.freifunk-ol.de/root/netmon.git netmon-$community",
