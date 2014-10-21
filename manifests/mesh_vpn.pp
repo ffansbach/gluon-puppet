@@ -252,6 +252,7 @@ define gluon::mesh_vpn (
         exec { "/etc/fastd/$community/peers/$hostname":
             command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";/; p }' /root/fastd-ffan-key.txt > /etc/fastd/$community/peers/$hostname",
             creates     => "/etc/fastd/$community/peers/$hostname",
+            require     => Exec["/root/fastd-$community-key.txt"],
         }
 
         cron { "sync_push_$community":
