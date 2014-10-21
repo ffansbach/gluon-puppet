@@ -28,6 +28,11 @@ class gluon {
         ensure => present,
     }
 
+    # auto-install firewall rules on boot
+    package { 'iptables-persistent':
+        ensure => present,
+    }
+
 
     # configure ip forwarding for IPv4 & IPv6
     sysctl { 'net.ipv4.ip_forward':
