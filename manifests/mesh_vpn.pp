@@ -13,6 +13,8 @@
 # - The $forward_accept list of IPv4 addresses to which to route without using the VPN
 # - The $site_config option, whether to provide a gluon site directory
 # - The $city_name to use throughout site/site.conf
+# - The $dhcp_range_start and $dhcp_range_end
+# - The $dhcp_leasetime
 # - The $github_repo to sync peers files to and from
 # - The $github_owner of the repo.
 # - The $auto_update_pubkey to list in the gluon site/site.conf
@@ -51,6 +53,10 @@ define gluon::mesh_vpn (
 
     $forward_iface      = false,
     $forward_accept     = [],
+
+    $dhcp_range_start   = undef,
+    $dhcp_range_end     = undef,
+    $dhcp_leasetime     = '10m',
 
     $github_owner       = undef,
     $github_repo        = undef,
@@ -257,6 +263,15 @@ define gluon::mesh_vpn (
             minute  => "*/15",
         }
 
+    }
+
+    if $dhcp_range_start and $dhcp_range_end {
+        file { "/etc/dnsmasq.d/$community.conf":
+            ensure      => present,
+            content     => template('gluon/dnsmasq.conf'),
+            notify      => Service['dnsmasq'],
+            require     => Package['dnsmasq'],
+        }
     }
 }
 
