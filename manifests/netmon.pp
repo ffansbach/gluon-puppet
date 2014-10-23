@@ -36,12 +36,15 @@ define gluon::netmon (
     }
 
     apache::vhost { $netmon_domain:
-        ip              => '*',
-        port            => 80,
-        add_listen      => false,
-        docroot         => "/srv/netmon-$community",
-        servername      => $netmon_domain,
-        serveraliases   => [ "netmon.$community_essid" ],
+        ip                  => '*',
+        port                => 80,
+        add_listen          => false,
+        docroot             => "/srv/netmon-$community",
+        servername          => $netmon_domain,
+        serveraliases       => [ "netmon.$community_essid" ],
+        php_admin_values    => [
+                "session.save_path \"/srv/sessions-$community/\"",
+            ],
     }
 
     if $ssl {
@@ -57,6 +60,10 @@ define gluon::netmon (
             ssl_key         => $ssl_key,
             ssl_chain       => $ssl_chain,
             ssl_ca          => $ssl_ca,
+
+            php_admin_values    => [
+                    "session.save_path \"/srv/sessions-$community/\"",
+                ],
         }
     }
 
@@ -68,6 +75,12 @@ define gluon::netmon (
 
     file { "/srv/netmon-$community/config":
         mode    => 644,
+        owner   => "www-data",
+    }
+
+    file { "/srv/sessions-$community/":
+        ensure  => directory,
+        mode    => 700,
         owner   => "www-data",
     }
 
