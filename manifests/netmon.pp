@@ -17,6 +17,7 @@ define gluon::netmon (
     $admin_email            = undef,
 
     $ssl                    = false,
+    $ssl_redirect           = false,
     $ssl_cert               = $::apache::default_ssl_cert,
     $ssl_key                = $::apache::default_ssl_key,
     $ssl_chain              = $::apache::default_ssl_chain,
@@ -45,6 +46,17 @@ define gluon::netmon (
         php_admin_values    => [
                 "session.save_path \"/srv/sessions-$community/\"",
             ],
+
+        rewrites            => $ssl_redirect ? {
+                true => [
+                    {
+                        comment         => "redirect all non-router traffic to https",
+                        rewrite_cond    => [ "%{HTTP_USER_AGENT} !^Wget" ],
+                        rewrite_rule    => "^/(.*) https://$netmon_domain/\$1",
+                    }
+                ],
+                default => undef
+            },
     }
 
     if $ssl {
