@@ -15,6 +15,7 @@
 # - The $city_name to use throughout site/site.conf
 # - The $dhcp_range_start and $dhcp_range_end
 # - The $dhcp_leasetime
+# - The $mtu of the mesh vpn device
 # - The $gateway_ipaddr of this gateway (used by other nodes to connect to here)
 # - The $github_repo to sync peers files to and from
 # - The $github_owner of the repo.
@@ -51,6 +52,7 @@ define gluon::mesh_vpn (
     $ip6_prefix         = undef,
 
     $fastd_port         = 10000,
+    $mtu                = 1426,
 
     $forward_iface      = false,
     $forward_accept     = [],
@@ -230,6 +232,7 @@ define gluon::mesh_vpn (
             ntp_server          => $ip6_address,
             fastd_port          => $fastd_port,
             auto_update_pubkey  => $auto_update_pubkey,
+            mtu                 => $mtu,
         }
     }
 
