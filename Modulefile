@@ -1,5 +1,5 @@
 name    'stesie-gluon'
-version '0.2.0'
+version '0.3.0'
 source 'https://github.com/ffansbach/gluon-puppet'
 author 'stesie'
 license 'Apache License, Version 2.0'
