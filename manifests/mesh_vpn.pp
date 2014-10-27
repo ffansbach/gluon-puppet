@@ -9,7 +9,6 @@
 # - The $ip6_address of this gateway within the Mesh network; /64 mask is assumed
 # - The $ip6_prefix of the Mesh network with trailing double colons
 # - The $fastd_port to configure fastd to listen on
-# - The $forward_iface to which to forward all traffic; i.e. the tun device of your VPN
 # - The $site_config option, whether to provide a gluon site directory
 # - The $city_name to use throughout site/site.conf
 # - The $dhcp_range_start and $dhcp_range_end
@@ -35,8 +34,6 @@
 #      ip6_prefix      => '2001:470:5168::',
 #      ip4_address     => '10.123.1.2',
 #      ip4_netmask     => '255.255.255.0',
-#      forward_iface   => 'tun+',
-#      forward_accept  => [ '176.9.120.153/32', '176.9.129.236/32' ],
 #  }
 #
 define gluon::mesh_vpn (
@@ -52,9 +49,6 @@ define gluon::mesh_vpn (
 
     $fastd_port         = 10000,
     $mtu                = 1426,
-
-    $forward_iface      = false,
-    $forward_accept     = [],
 
     $dhcp_range_start   = undef,
     $dhcp_range_end     = undef,
@@ -118,67 +112,8 @@ define gluon::mesh_vpn (
 
 
     #
-    # (legacy) firewalling rules
+    # firewalling rules
     #
-
-    # mark any traffic from the mesh to the internet with 0x2342;
-    # used for policy based routing (to either tor or vpn) later on
-    firewall { "200 mark $community traffic":
-        ensure          => absent,
-        table           => 'mangle',
-        chain           => 'PREROUTING',
-        proto           => 'all',
-        iniface         => "br_$community",
-        jump            => 'MARK',
-        set_mark        => '0x2342/0xffffffff',
-    }
-
-    # ... and allow passing the traffic back and forth through forwarding filter
-    firewall { "110 allow forward $community traffic":
-        ensure          => absent,
-        table           => 'filter',
-        chain           => 'FORWARD',
-        proto           => 'all',
-        iniface         => "br_$community",
-        source          => "$ip4_address/$ip4_netmask",
-        outiface        => $forward_iface,
-        action          => accept,
-    }
-
-    firewall { "110 allow replies to forwarded $community traffic":
-        ensure          => absent,
-        table           => 'filter',
-        chain           => 'FORWARD',
-        proto           => 'all',
-        iniface         => $forward_iface,
-        outiface        => "br_$community",
-        destination     => "$ip4_address/$ip4_netmask",
-        action          => accept,
-    }
-
-    # last not least masquerade outgoing traffic
-    firewall { "120 masquerade $community traffic":
-        ensure          => absent,
-        table           => 'nat',
-        chain           => 'POSTROUTING',
-        proto           => 'all',
-        source          => "$ip4_address/$ip4_netmask",
-        outiface        => $forward_iface,
-        jump            => 'MASQUERADE',
-    }
-
-    # special exception is traffic that may be routed directly,
-    # according to $forward_accept parameter.
-    mesh_forward { $forward_accept:
-        ensure          => absent,
-        community       => $community,
-        mesh_net        => "$ip4_address/$ip4_netmask",
-    }
-
-
-
-
-
 
     # run all traffic from the mesh through the from_mesh mangle chain,
     # which finally marks it for policy based routing (i.e. to vpn provider)
@@ -347,52 +282,3 @@ define gluon::mesh_vpn (
 
 
 
-# helper definition to map $forward_accept array of gluon::mesh_vpn type
-# should *not* be used directly from external manifests
-define mesh_forward (
-    $ensure = 'present',
-    $community,
-    $mesh_net
-) {
-    firewall { "100 accept $community traffic to $name":
-        ensure          => $ensure,
-        table           => 'mangle',
-        chain           => 'PREROUTING',
-        proto           => 'all',
-        iniface         => "br_$community",
-        destination     => $name,
-        action          => accept,
-    }
-
-    firewall { "110 allow forward $community traffic to $name":
-        ensure          => $ensure,
-        table           => 'filter',
-        chain           => 'FORWARD',
-        proto           => 'all',
-        iniface         => "br_$community",
-        source          => $mesh_net,
-        destination     => $name,
-        action          => accept,
-    }
-
-    firewall { "110 allow replies to forwarded $community traffic to $name":
-        ensure          => $ensure,
-        table           => 'filter',
-        chain           => 'FORWARD',
-        proto           => 'all',
-        source          => $name,
-        outiface        => "br_$community",
-        destination     => $mesh_net,
-        action          => accept,
-    }
-
-    firewall { "120 masquerade $community traffic to $name":
-        ensure          => $ensure,
-        table           => 'nat',
-        chain           => 'POSTROUTING',
-        proto           => 'all',
-        source          => $mesh_net,
-        destination     => $name,
-        jump            => 'MASQUERADE',
-    }
-}
