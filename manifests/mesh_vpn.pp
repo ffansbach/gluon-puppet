@@ -62,6 +62,8 @@ define gluon::mesh_vpn (
     $site_config                = true,
     $auto_update_pubkey         = undef,
     $auto_update_seckey_file    = undef,
+
+    $enable_radvd	= true,
 ) {
     include gluon
 
@@ -203,11 +205,12 @@ define gluon::mesh_vpn (
 
     #
     # configure ipv6 router advertising daemon
-    # FIXME probably should be possible to be disabled
     #
-    concat::fragment { "radvd-$community":
-        target      => "/etc/radvd.conf",
-        content     => template('gluon/radvd.conf'),
+    if $enable_radvd {
+	concat::fragment { "radvd-$community":
+	    target      => "/etc/radvd.conf",
+	    content     => template('gluon/radvd.conf'),
+	}
     }
 
 
