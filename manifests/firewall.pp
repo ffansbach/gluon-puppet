@@ -1,5 +1,6 @@
 class gluon::firewall (
     $forward_iface,
+    $direct_iface,
 ) {
     # auto-install firewall rules on boot
     package { 'iptables-persistent':
