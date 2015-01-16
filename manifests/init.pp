@@ -122,6 +122,11 @@ class gluon {
         notify      => Service['radvd'],
     }
 
+    concat::fragment { "radvd-$community":
+	target      => "/etc/radvd.conf",
+	content     => "",
+    }
+
     service { 'radvd':
         ensure      => running,
         require     => Package['radvd'],
