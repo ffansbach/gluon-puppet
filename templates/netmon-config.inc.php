@@ -6,4 +6,6 @@ $GLOBALS['mysql_db'] = "netmon_<%= @community %>";
 $GLOBALS['mysql_user'] = "netmon_<%= @community %>";
 $GLOBALS['mysql_password'] = "foobar";
 
+$GLOBALS['crawllog'] = true;
+
 ?>
