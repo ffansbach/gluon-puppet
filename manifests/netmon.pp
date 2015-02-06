@@ -128,11 +128,6 @@ define gluon::netmon (
         minute  => '*/10'
     }
 
-    file { "/srv/netmon-$community/templates/base/html/header.tpl.html":
-        source      => "puppet:///modules/gluon/header.tpl.html",
-        require     => Exec["clone-netmon-$community"],
-    }
-
     exec { "/srv/netmon-$community/lib/core/menus.class.php":
         command     => "sed -ie '/FF-Map 3D/d' /srv/netmon-$community/lib/core/menus.class.php",
         onlyif      => "grep -qe 'FF-Map 3D' /srv/netmon-$community/lib/core/menus.class.php",
