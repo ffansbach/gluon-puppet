@@ -121,6 +121,20 @@ define gluon::site_config (
             allow_override => 'None',
             directoryindex => '',
         },
+        {
+            provider       => 'directory',
+            path           => "/srv/images-$community",
+            options        => ['Indexes','FollowSymLinks','MultiViews'],
+            allow_override => 'None',
+            directoryindex => '',
+        },
+        {
+            provider       => 'directory',
+            path           => "/srv/firmware-$community",
+            options        => ['Indexes','FollowSymLinks','MultiViews'],
+            allow_override => 'None',
+            directoryindex => '',
+        },
     ]
 
     apache::vhost { $ip6_address:
@@ -132,7 +146,8 @@ define gluon::site_config (
 
         aliases         => [
             { alias => "/site/", path => "/srv/gluon-$community/site/" },
-            { alias => "/images/", path => "/srv/gluon-$community/images/" },
+            { alias => "/images/", path => "/srv/images-$community/" },
+            { alias => "/firmware/", path => "/srv/firmware-$community/" },
         ],
         directories     => $directories,
     }
@@ -146,7 +161,8 @@ define gluon::site_config (
 
         aliases         => [
             { alias => "/site/", path => "/srv/gluon-$community/site/" },
-            { alias => "/images/", path => "/srv/gluon-$community/images/" },
+            { alias => "/images/", path => "/srv/images-$community/" },
+            { alias => "/firmware/", path => "/srv/firmware-$community/" },
         ],
         directories     => $directories,
     }
@@ -166,7 +182,8 @@ define gluon::site_config (
 
             aliases         => [
                 { alias => "/site/", path => "/srv/gluon-$community/site/" },
-                { alias => "/images/", path => "/srv/gluon-$community/images/" },
+                { alias => "/images/", path => "/srv/images-$community/" },
+                { alias => "/firmware/", path => "/srv/firmware-$community/" },
             ],
             directories     => $directories,
         }

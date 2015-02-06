@@ -60,6 +60,11 @@ define gluon::mesh_vpn (
     $gateway_ipaddr     = $ipaddress_eth0,
 
     $site_config                = true,
+    $site_config_ssl            = false,
+    $site_config_ssl_key        = $::apache::default_ssl_key,
+    $site_config_ssl_cert       = $::apache::default_ssl_cert,
+    $site_config_ssl_chain      = $::apache::default_ssl_chain,
+    $site_config_ssl_ca         = $::apache::default_ssl_ca,
     $auto_update_pubkey         = undef,
     $auto_update_seckey_file    = undef,
 
@@ -227,6 +232,12 @@ define gluon::mesh_vpn (
             fastd_port          => $fastd_port,
             auto_update_pubkey  => $auto_update_pubkey,
             mtu                 => $mtu,
+
+            ssl                 => $site_config_ssl,
+            ssl_key             => $site_config_ssl_key,
+            ssl_cert            => $site_config_ssl_cert,
+            ssl_chain           => $site_config_ssl_chain,
+            ssl_ca              => $site_config_ssl_ca,
         }
     }
 
