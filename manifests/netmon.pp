@@ -123,7 +123,7 @@ define gluon::netmon (
     }
 
     cron { "crawl_$community":
-        command => "/usr/bin/php /srv/netmon-$community/cronjobs.php",
+        command => "/usr/bin/php /srv/netmon-$community/cronjobs.php > /dev/null",
         user    => root,
         minute  => '*/10'
     }

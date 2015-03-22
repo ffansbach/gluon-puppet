@@ -302,7 +302,56 @@ define gluon::mesh_vpn (
 	target      => "/usr/local/sbin/ffgw-off",
 	content     => "batctl -m bat_$community gw off\n",
     }
+
+
+    
+    concat::fragment { "nagios-$community-dns":
+	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+	content     => "define service {
+                            host                            localhost
+                            service_description             $community DNS
+                            check_command                   check_mesh_dns!$ip4_address
+                            use                             generic-service
+                    }\n",
+    }
+
+    concat::fragment { "nagios-$community-promisc-bat":
+	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+	content     => "define service {
+                            host                            localhost
+                            service_description             $community Promiscuous Batman
+                            check_command                   check_ifpromisc!bat_$community
+                            use                             generic-service
+                    }\n",
+    }
+
+    concat::fragment { "nagios-$community-promisc-br":
+	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+	content     => "define service {
+                            host                            localhost
+                            service_description             $community Promiscuous Bridge
+                            check_command                   check_ifpromisc!br_$community
+                            use                             generic-service
+                    }\n",
+    }
+
+    concat::fragment { "nagios-$community-promisc-mesh":
+	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+	content     => "define service {
+                            host                            localhost
+                            service_description             $community Promiscuous Mesh
+                            check_command                   check_ifpromisc!mesh_$community
+                            use                             generic-service
+                    }\n",
+    }
+
+    concat::fragment { "nagios-$community-fastd":
+	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+	content     => "define service {
+                            host                            localhost
+                            service_description             $community FastD
+                            check_command                   check_fastd!$community
+                            use                             generic-service
+                    }\n",
+    }
 }
-
-
-
