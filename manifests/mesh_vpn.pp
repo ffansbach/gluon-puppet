@@ -292,6 +292,16 @@ define gluon::mesh_vpn (
             require     => Package['dnsmasq'],
         }
     }
+
+    concat::fragment { "ffgw-on-$community":
+	target      => "/usr/local/sbin/ffgw-on",
+	content     => "batctl -m bat_$community gw server\n",
+    }
+
+    concat::fragment { "ffgw-off-$community":
+	target      => "/usr/local/sbin/ffgw-off",
+	content     => "batctl -m bat_$community gw off\n",
+    }
 }
 
 
