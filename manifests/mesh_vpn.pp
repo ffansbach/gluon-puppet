@@ -61,10 +61,10 @@ define gluon::mesh_vpn (
 
     $site_config                = true,
     $site_config_ssl            = false,
-    $site_config_ssl_key        = $::apache::default_ssl_key,
-    $site_config_ssl_cert       = $::apache::default_ssl_cert,
-    $site_config_ssl_chain      = $::apache::default_ssl_chain,
-    $site_config_ssl_ca         = $::apache::default_ssl_ca,
+    $site_config_ssl_key        = undef, # @fixme $::apache::default_ssl_key,
+    $site_config_ssl_cert       = undef, # @fixme $::apache::default_ssl_cert,
+    $site_config_ssl_chain      = undef, # @fixme $::apache::default_ssl_chain,
+    $site_config_ssl_ca         = undef, # @fixme $::apache::default_ssl_ca,
     $auto_update_pubkey         = undef,
     $auto_update_seckey_file    = undef,
 
@@ -78,7 +78,7 @@ define gluon::mesh_vpn (
     #  - a bridge, which wraps the batman device
     network::interface { "br_$community":
         auto            => false,
-        bridge_ports    => 'none',
+        bridge_ports    => [ 'none' ],
         ipaddress       => $ip4_address,
         netmask         => $ip4_netmask,
         post_up         => [
@@ -355,3 +355,4 @@ define gluon::mesh_vpn (
                     }\n",
     }
 }
+

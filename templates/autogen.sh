@@ -12,10 +12,11 @@ fi
 git remote rm origin || true
 git remote add origin https://github.com/freifunk-gluon/gluon.git
 
-git pull origin master
+git fetch origin
+git checkout v2015.1
 
 make update
-make GLUON_BRANCH="$branch" $*
+make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-generic" $*
 make manifest GLUON_BRANCH="$branch"
 
 <% if @auto_update_seckey_file %>

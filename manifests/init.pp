@@ -8,15 +8,14 @@
 class gluon {
     # include universe_factory apt repository for batman & fastd packages
     apt::key { 'universe_factory':
-        key         => '16EF3F64CB201D9C',
-        key_server  => 'pgp.mit.edu',
+        id      => '16EF3F64CB201D9C',
+        server  => 'pgp.mit.edu',
     }
 
     apt::source { 'universe_factory':
         location    => 'http://repo.universe-factory.net/debian/',
         release     => 'sid',
         repos       => 'main',
-        include_src => false,
         require     => Apt::Key['universe_factory'],
     }
 
@@ -164,6 +163,10 @@ class gluon {
 
     # install cron-apt
     package { 'cron-apt':
+        ensure      => present,
+    }
+
+    package { [ 'gawk', 'g++', 'subversion', 'libncurses5-dev', 'zlib1g-dev' ]:
         ensure      => present,
     }
 }
