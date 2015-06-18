@@ -50,6 +50,8 @@ define gluon::mesh_vpn (
     $fastd_port         = 10000,
     $mtu                = 1426,
 
+    $mesh_bssid         = undef,
+
     $dhcp_range_start   = undef,
     $dhcp_range_end     = undef,
     $dhcp_leasetime     = '10m',
@@ -232,6 +234,7 @@ define gluon::mesh_vpn (
             fastd_port          => $fastd_port,
             auto_update_pubkey  => $auto_update_pubkey,
             mtu                 => $mtu,
+            mesh_bssid          => $mesh_bssid,
 
             ssl                 => $site_config_ssl,
             ssl_key             => $site_config_ssl_key,
