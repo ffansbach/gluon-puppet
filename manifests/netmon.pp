@@ -18,17 +18,17 @@ define gluon::netmon (
 
     $ssl                    = false,
     $ssl_redirect           = false,
-    $ssl_cert               = $::apache::default_ssl_cert,
-    $ssl_key                = $::apache::default_ssl_key,
-    $ssl_chain              = $::apache::default_ssl_chain,
-    $ssl_ca                 = $::apache::default_ssl_ca,
+    $ssl_cert               = undef, #$::apache::default_ssl_cert,
+    $ssl_key                = undef, #$::apache::default_ssl_key,
+    $ssl_chain              = undef, #$::apache::default_ssl_chain,
+    $ssl_ca                 = undef, #$::apache::default_ssl_ca,
 
 ) {
     include gluon::netmon_common
 
     exec { "clone-netmon-$community":
         creates => "/srv/netmon-$community",
-        command => "/usr/bin/git clone http://git.freifunk-ol.de/root/netmon.git netmon-$community",
+        command => "/usr/bin/git clone https://github.com/ffansbach/netmon.git netmon-$community",
         cwd     => "/srv",
 
         # kind of a hack, this provides feedback to the network interface post-up

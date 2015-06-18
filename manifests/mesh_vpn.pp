@@ -59,6 +59,7 @@ define gluon::mesh_vpn (
     $github_owner       = undef,
     $github_repo        = undef,
 
+
     $gateway_ipaddr     = $ipaddress_eth0,
 
     $site_config                = true,
@@ -70,7 +71,7 @@ define gluon::mesh_vpn (
     $auto_update_pubkey         = undef,
     $auto_update_seckey_file    = undef,
 
-    $enable_radvd	= true,
+    $enable_radvd       = true,
 ) {
     include gluon
 
@@ -97,7 +98,9 @@ define gluon::mesh_vpn (
         method          => 'manual',
         pre_up          => [
             "batctl -m bat_$community if add mesh_$community",
-            "batctl -m bat_$community gw server",
+            ($::gluon::gateway ? { 
+                true    => "batctl -m bat_$community gw server", 
+                false   => "batctl -m bat_$community gw client" }),
             "ifup br_$community",
         ],
         up              => [
@@ -123,53 +126,54 @@ define gluon::mesh_vpn (
     #
     # firewalling rules
     #
+    if($::gluon::gateway) {
+        # run all traffic from the mesh through the from_mesh mangle chain,
+        # which finally marks it for policy based routing (i.e. to vpn provider)
+        firewall { "150 possibly mark $community traffic":
+            table           => 'mangle',
+            chain           => 'PREROUTING',
+            proto           => 'all',
+            iniface         => "br_$community",
+            jump            => 'from_mesh',
+        }
 
-    # run all traffic from the mesh through the from_mesh mangle chain,
-    # which finally marks it for policy based routing (i.e. to vpn provider)
-    firewall { "150 possibly mark $community traffic":
-        table           => 'mangle',
-        chain           => 'PREROUTING',
-        proto           => 'all',
-        iniface         => "br_$community",
-        jump            => 'from_mesh',
-    }
+        # don't mark traffic from other meshes to this one
+        firewall { "100 accept mesh to $community traffic":
+            table           => 'mangle',
+            chain           => 'from_mesh',
+            proto           => 'all',
+            destination     => "$ip4_address/$ip4_netmask",
+            jump            => RETURN,
+        }
 
-    # don't mark traffic from other meshes to this one
-    firewall { "100 accept mesh to $community traffic":
-        table           => 'mangle',
-        chain           => 'from_mesh',
-        proto           => 'all',
-        destination     => "$ip4_address/$ip4_netmask",
-        jump            => RETURN,
-    }
+        # run all traffic from this mesh through "from_mesh" filter chain
+        firewall { "110 handle outbound $community traffic":
+            table           => 'filter',
+            chain           => 'FORWARD',
+            proto           => 'all',
+            iniface         => "br_$community",
+            source          => "$ip4_address/$ip4_netmask",
+            jump            => 'from_mesh',
+        }
 
-    # run all traffic from this mesh through "from_mesh" filter chain
-    firewall { "110 handle outbound $community traffic":
-        table           => 'filter',
-        chain           => 'FORWARD',
-        proto           => 'all',
-        iniface         => "br_$community",
-        source          => "$ip4_address/$ip4_netmask",
-        jump            => 'from_mesh',
-    }
+        # pick traffic from "to_mesh" chain to this mesh
+        firewall { "110 pick to_mesh traffic for $community":
+            table           => 'filter',
+            chain           => 'to_mesh',
+            proto           => 'all',
+            outiface        => "br_$community",
+            destination     => "$ip4_address/$ip4_netmask",
+            action          => accept,
+        }
 
-    # pick traffic from "to_mesh" chain to this mesh
-    firewall { "110 pick to_mesh traffic for $community":
-        table           => 'filter',
-        chain           => 'to_mesh',
-        proto           => 'all',
-        outiface        => "br_$community",
-        destination     => "$ip4_address/$ip4_netmask",
-        action          => accept,
-    }
-
-    # masquerade outgoing traffic from community's iprange
-    firewall { "100 masquerade $community traffic":
-        table           => 'nat',
-        chain           => 'POSTROUTING',
-        proto           => 'all',
-        source          => "$ip4_address/$ip4_netmask",
-        jump            => 'from_mesh',
+        # masquerade outgoing traffic from community's iprange
+        firewall { "100 masquerade $community traffic":
+            table           => 'nat',
+            chain           => 'POSTROUTING',
+            proto           => 'all',
+            source          => "$ip4_address/$ip4_netmask",
+            jump            => 'from_mesh',
+        }
     }
 
 
@@ -213,15 +217,15 @@ define gluon::mesh_vpn (
     #
     # configure ipv6 router advertising daemon
     #
-    if $enable_radvd {
-	concat::fragment { "radvd-$community":
-	    target      => "/etc/radvd.conf",
-	    content     => template('gluon/radvd.conf'),
-	}
+    if $::gluon::gateway and $enable_radvd {
+        concat::fragment { "radvd-$community":
+            target      => "/etc/radvd.conf",
+            content     => template('gluon/radvd.conf'),
+        }
     }
 
 
-    if $site_config {
+    if $::gluon::gateway and $site_config {
         include gluon::apache_common
 
         gluon::site_config { $name:
@@ -263,10 +267,19 @@ define gluon::mesh_vpn (
             user        => "freifunker",
         }
 
-        exec { "/etc/fastd/$community/peers/$hostname":
-            command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";\\nremote $gateway_ipaddr:$fastd_port;/; p }' /root/fastd-$community-key.txt > /etc/fastd/$community/peers/$hostname",
-            creates     => "/etc/fastd/$community/peers/$hostname",
-            require     => Exec["/root/fastd-$community-key.txt"],
+        if $::gluon::gateway {
+            exec { "/etc/fastd/$community/peers/$hostname":
+                command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";\\nremote $gateway_ipaddr:$fastd_port;/; p }' /root/fastd-$community-key.txt > /etc/fastd/$community/peers/$hostname",
+                creates     => "/etc/fastd/$community/peers/$hostname",
+                require     => Exec["/root/fastd-$community-key.txt"],
+            }
+        }
+        else {
+            exec { "/etc/fastd/$community/peers/$hostname":
+                command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";/; p }' /root/fastd-$community-key.txt > /etc/fastd/$community/peers/$hostname",
+                creates     => "/etc/fastd/$community/peers/$hostname",
+                require     => Exec["/root/fastd-$community-key.txt"],
+            }
         }
 
         cron { "sync_push_$community":
@@ -287,30 +300,31 @@ define gluon::mesh_vpn (
 
     }
 
-    if $dhcp_range_start and $dhcp_range_end {
-        file { "/etc/dnsmasq.d/$community.conf":
-            ensure      => present,
-            content     => template('gluon/dnsmasq.conf'),
-            notify      => Service['dnsmasq'],
-            require     => Package['dnsmasq'],
+    if $::gluon::gateway {
+        if $dhcp_range_start and $dhcp_range_end {
+            file { "/etc/dnsmasq.d/$community.conf":
+                ensure      => present,
+                content     => template('gluon/dnsmasq.conf'),
+                notify      => Service['dnsmasq'],
+                require     => Package['dnsmasq'],
+            }
+        }
+
+        concat::fragment { "ffgw-on-$community":
+            target      => "/usr/local/sbin/ffgw-on",
+            content     => "batctl -m bat_$community gw server\n",
+        }
+
+        concat::fragment { "ffgw-off-$community":
+            target      => "/usr/local/sbin/ffgw-off",
+            content     => "batctl -m bat_$community gw off\n",
         }
     }
 
-    concat::fragment { "ffgw-on-$community":
-	target      => "/usr/local/sbin/ffgw-on",
-	content     => "batctl -m bat_$community gw server\n",
-    }
-
-    concat::fragment { "ffgw-off-$community":
-	target      => "/usr/local/sbin/ffgw-off",
-	content     => "batctl -m bat_$community gw off\n",
-    }
-
-
     
     concat::fragment { "nagios-$community-dns":
-	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
-	content     => "define service {
+        target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+        content     => "define service {
                             host                            localhost
                             service_description             $community DNS
                             check_command                   check_mesh_dns!$ip4_address
@@ -319,8 +333,8 @@ define gluon::mesh_vpn (
     }
 
     concat::fragment { "nagios-$community-promisc-bat":
-	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
-	content     => "define service {
+        target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+        content     => "define service {
                             host                            localhost
                             service_description             $community Promiscuous Batman
                             check_command                   check_ifpromisc!bat_$community
@@ -329,8 +343,8 @@ define gluon::mesh_vpn (
     }
 
     concat::fragment { "nagios-$community-promisc-br":
-	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
-	content     => "define service {
+        target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+        content     => "define service {
                             host                            localhost
                             service_description             $community Promiscuous Bridge
                             check_command                   check_ifpromisc!br_$community
@@ -339,8 +353,8 @@ define gluon::mesh_vpn (
     }
 
     concat::fragment { "nagios-$community-promisc-mesh":
-	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
-	content     => "define service {
+        target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+        content     => "define service {
                             host                            localhost
                             service_description             $community Promiscuous Mesh
                             check_command                   check_ifpromisc!mesh_$community
@@ -349,8 +363,8 @@ define gluon::mesh_vpn (
     }
 
     concat::fragment { "nagios-$community-fastd":
-	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
-	content     => "define service {
+        target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+        content     => "define service {
                             host                            localhost
                             service_description             $community FastD
                             check_command                   check_fastd!$community
