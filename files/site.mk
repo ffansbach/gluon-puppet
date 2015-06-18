@@ -25,9 +25,10 @@ GLUON_SITE_PACKAGES := \
 	ffol-configurator \
 	ffol-nodewatcher
 
-DEFAULT_GLUON_RELEASE := 2014.3.$(shell date '+%Y%m%d')
+DEFAULT_GLUON_RELEASE := 2015.1.$(shell date '+%Y%m%d')
 
 # Allow overriding the release number from the command line
 GLUON_RELEASE ?= $(DEFAULT_GLUON_RELEASE)
 
 GLUON_PRIORITY ?= 0
+GLUON_LANGS ?= de en
