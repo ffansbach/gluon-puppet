@@ -206,6 +206,7 @@ define gluon::mesh_vpn (
         ]
     }
 
+    $bind_fastd_port = $::gluon::gateway
     file { "/etc/fastd/$community/fastd.conf":
         ensure      => present,
         content     => template('gluon/fastd.conf'),
