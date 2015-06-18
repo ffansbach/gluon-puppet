@@ -13,6 +13,11 @@ class gluon::netmon_common {
         ensure  => present,
     }
 
+    # netmon needs curl
+    package { 'curl':
+        ensure  => present,
+    }
+
 
     # netmon needs a mail transfer agent
     package { 'exim4':
