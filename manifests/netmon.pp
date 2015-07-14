@@ -88,6 +88,31 @@ define gluon::netmon (
     file { "/srv/netmon-$community/config":
         mode    => 644,
         owner   => "www-data",
+        require => Exec["clone-netmon-$community"],
+    }
+
+    file { "/srv/netmon-$community/templates_c":
+        mode    => 755,
+        owner   => "www-data",
+        require => Exec["clone-netmon-$community"],
+    }
+
+    file { "/srv/netmon-$community/tmp":
+        mode    => 755,
+        owner   => "www-data",
+        require => Exec["clone-netmon-$community"],
+    }
+
+    file { "/srv/netmon-$community/rrdtool/databases":
+        mode    => 755,
+        owner   => "www-data",
+        require => Exec["clone-netmon-$community"],
+    }
+
+    file { "/srv/netmon-$community/rrdtool":
+        mode    => 755,
+        owner   => "www-data",
+        require => Exec["clone-netmon-$community"],
     }
 
     file { "/srv/sessions-$community/":
