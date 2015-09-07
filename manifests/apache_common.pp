@@ -22,6 +22,9 @@ class gluon::apache_common {
     class { 'apache::mod::php':
     }
 
+    class { 'apache::mod::rewrite':
+    }
+
     package { [ 'php5-mysql', 'php5-gmp', 'php5-curl', 'php5-gd' ]:
         ensure  => present,
     }
