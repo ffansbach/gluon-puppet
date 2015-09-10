@@ -43,6 +43,7 @@ define gluon::netmon (
         docroot             => "/srv/netmon-$community",
         servername          => $netmon_domain,
         serveraliases       => [ "netmon.$community_essid" ],
+        override            => [ "All" ],
         php_admin_values    => [
                 "session.save_path \"/srv/sessions-$community/\"",
             ],
