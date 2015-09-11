@@ -59,6 +59,8 @@ define gluon::mesh_vpn (
     $github_owner       = undef,
     $github_repo        = undef,
 
+    $cipher             = 'salsa2012+gmac',
+
 
     $gateway_ipaddr     = $ipaddress_eth0,
 
