@@ -212,7 +212,7 @@ define gluon::mesh_vpn (
     file { "/etc/fastd/$community/fastd.conf":
         ensure      => present,
         content     => template('gluon/fastd.conf'),
-        notify      => Service['fastd'],
+        #notify      => Service['fastd'],
         before      => Service['fastd'],
     }
 
