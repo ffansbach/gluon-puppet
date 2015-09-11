@@ -154,6 +154,12 @@ define gluon::netmon (
         minute  => '*/10'
     }
 
+    cron { "update_$community":
+        command => "cd /srv/netmon-$community && /usr/bin/git pull --quiet --rebase origin master",
+        user    => root,
+        minute  => '52'
+    }
+
     exec { "/srv/netmon-$community/lib/core/menus.class.php":
         command     => "sed -ie '/FF-Map 3D/d' /srv/netmon-$community/lib/core/menus.class.php",
         onlyif      => "grep -qe 'FF-Map 3D' /srv/netmon-$community/lib/core/menus.class.php",
