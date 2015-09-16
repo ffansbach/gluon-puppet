@@ -220,6 +220,7 @@ define gluon::mesh_vpn (
     # configure ipv6 router advertising daemon
     #
     if $::gluon::gateway and $enable_radvd {
+        include gluon::radvd
         concat::fragment { "radvd-$community":
             target      => "/etc/radvd.conf",
             content     => template('gluon/radvd.conf'),
