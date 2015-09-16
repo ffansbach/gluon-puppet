@@ -61,7 +61,6 @@ define gluon::mesh_vpn (
 
     $cipher             = 'salsa2012+gmac',
 
-
     $gateway_ipaddr     = $ipaddress_eth0,
 
     $site_config                = true,
@@ -242,6 +241,7 @@ define gluon::mesh_vpn (
             auto_update_pubkey  => $auto_update_pubkey,
             mtu                 => $mtu,
             mesh_bssid          => $mesh_bssid,
+            cipher              => $cipher,
 
             ssl                 => $site_config_ssl,
             ssl_key             => $site_config_ssl_key,
