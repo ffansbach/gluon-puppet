@@ -45,6 +45,12 @@ define gluon::site_config (
         mode        => 755,
     }
 
+    file { "/srv/gluon-$community/propagate.sh":
+        ensure      => present,
+        content     => template('gluon/propagate.sh'),
+        mode        => 755,
+    }
+
     file { "/srv/gluon-$community/site/":
         ensure      => directory
     }
