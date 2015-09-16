@@ -10,7 +10,7 @@ class gluon (
 ) {
     # include universe_factory apt repository for batman & fastd packages
     apt::key { 'universe_factory':
-        id      => '16EF3F64CB201D9C',
+        id      => '6664E7BDA6B669881EC52E7516EF3F64CB201D9C',
         server  => 'pgp.mit.edu',
     }
 
