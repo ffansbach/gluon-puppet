@@ -15,6 +15,7 @@ define gluon::site_config (
     $fastd_port             = undef,
     $mtu                    = 1426,
     $cipher                 = 'salsa2012+gmac',
+    $peers_dir              = undef,
 
     $site_name              = "Freifunk $city_name",
     $ssid                   = "$city_name.freifunk.net",

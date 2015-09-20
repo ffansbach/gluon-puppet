@@ -251,6 +251,7 @@ define gluon::mesh_vpn (
             mtu                 => $mtu,
             mesh_bssid          => $mesh_bssid,
             cipher              => $cipher,
+            peers_dir           => $real_peers_dir,
 
             ssl                 => $site_config_ssl,
             ssl_key             => $site_config_ssl_key,
