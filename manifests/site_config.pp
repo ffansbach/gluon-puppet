@@ -21,6 +21,7 @@ define gluon::site_config (
     $ssid                   = "$city_name.freifunk.net",
     $mesh_ssid              = "mesh.$city_name.freifunk.net",
     $mesh_bssid             = "02:44:CA:FF:23:42",
+    $mesh_bssid24           = "12:CA:FF:EE:23:42",
     $gateway_ipaddr         = $ipaddress_eth0,
 
     $ssl                    = false,

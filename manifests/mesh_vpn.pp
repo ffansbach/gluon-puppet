@@ -51,6 +51,7 @@ define gluon::mesh_vpn (
     $mtu                = 1426,
 
     $mesh_bssid         = undef,
+    $mesh_bssid24       = undef,
 
     $dhcp_range_start   = undef,
     $dhcp_range_end     = undef,
@@ -250,6 +251,7 @@ define gluon::mesh_vpn (
             auto_update_pubkey  => $auto_update_pubkey,
             mtu                 => $mtu,
             mesh_bssid          => $mesh_bssid,
+            mesh_bssid24        => $mesh_bssid24,
             cipher              => $cipher,
             peers_dir           => $real_peers_dir,
 
