@@ -13,7 +13,7 @@ git remote rm origin || true
 git remote add origin https://github.com/freifunk-gluon/gluon.git
 
 git fetch origin
-git checkout v2015.1.1
+git checkout v<%= @gluon_version %>
 
 make update
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-generic" $*

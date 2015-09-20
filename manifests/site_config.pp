@@ -1,6 +1,7 @@
 define gluon::site_config (
     $ensure                 = 'present',
     $community              = $name,
+    $gluon_version          = '2015.1.2',
 
     $city_name              = undef,
     $site_domain            = "site.freifunk-$city_name.de",
@@ -93,7 +94,7 @@ define gluon::site_config (
 
     file { "/srv/gluon-$community/site/site.mk":
         ensure      => present,
-        source      => "puppet:///modules/gluon/site.mk",
+        content     => template('gluon/site.mk'),
     }
 
     file { "/srv/gluon-$community/site/modules":
