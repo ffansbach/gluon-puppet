@@ -35,6 +35,12 @@ define gluon::site_config (
 
     $community_url          = "https://freifunk-$city_name.de/",
 ) {
+    file { "/srv/firmware-$community":
+        ensure      => directory,
+        group       => "freifunker",
+        mode        => 775,
+    }
+
     file { "/srv/gluon-$community":
         ensure      => directory,
         group       => "freifunker",
@@ -57,12 +63,26 @@ define gluon::site_config (
         ensure      => directory
     }
 
+    file { "/srv/gluon-$community/site/i18n/":
+        ensure      => directory
+    }
+
     file { "/srv/gluon-$community/gen-site.conf.sh":
         ensure      => present,
         content     => template('gluon/site.conf'),
         mode        => 755,
         notify      => Exec["/srv/gluon-$community/site/site.conf"],
         require     => Exec["/root/fastd-$community-key.txt"],
+    }
+
+    file { "/srv/gluon-$community/site/i18n/de.po":
+        ensure      => present,
+        content     => template('gluon/i18n/de.po'),
+    }
+
+    file { "/srv/gluon-$community/site/i18n/en.po":
+        ensure      => present,
+        content     => template('gluon/i18n/en.po'),
     }
 
     exec { "/srv/gluon-$community/site/site.conf":
