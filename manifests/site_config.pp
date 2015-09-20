@@ -14,6 +14,7 @@ define gluon::site_config (
     $ntp_server             = undef,
     $fastd_port             = undef,
     $mtu                    = 1426,
+    $cipher                 = 'salsa2012+gmac',
 
     $site_name              = "Freifunk $city_name",
     $ssid                   = "$city_name.freifunk.net",
@@ -41,6 +42,12 @@ define gluon::site_config (
     file { "/srv/gluon-$community/autogen.sh":
         ensure      => present,
         content     => template('gluon/autogen.sh'),
+        mode        => 755,
+    }
+
+    file { "/srv/gluon-$community/propagate.sh":
+        ensure      => present,
+        content     => template('gluon/propagate.sh'),
         mode        => 755,
     }
 

@@ -58,9 +58,9 @@ define gluon::mesh_vpn (
 
     $github_owner       = undef,
     $github_repo        = undef,
+    $peers_dir          = undef,
 
     $cipher             = 'salsa2012+gmac',
-
 
     $gateway_ipaddr     = $ipaddress_eth0,
 
@@ -76,6 +76,13 @@ define gluon::mesh_vpn (
     $enable_radvd       = true,
 ) {
     include gluon
+
+    if $github_owner and $github_repo {
+        $real_peers_dir = "/etc/fastd/${community}/peers"
+    }
+    elsif $peers_dir {
+        $real_peers_dir = $peers_dir
+    }
 
 
     # needed network interfaces
@@ -187,7 +194,7 @@ define gluon::mesh_vpn (
         require     => Package['fastd'],
     }
 
-    file { "/etc/fastd/$community/peers":
+    file { $real_peers_dir:
         ensure      => directory,
         group       => 'freifunker',
         mode        => 775,
@@ -221,6 +228,7 @@ define gluon::mesh_vpn (
     # configure ipv6 router advertising daemon
     #
     if $::gluon::gateway and $enable_radvd {
+        include gluon::radvd
         concat::fragment { "radvd-$community":
             target      => "/etc/radvd.conf",
             content     => template('gluon/radvd.conf'),
@@ -242,6 +250,7 @@ define gluon::mesh_vpn (
             auto_update_pubkey  => $auto_update_pubkey,
             mtu                 => $mtu,
             mesh_bssid          => $mesh_bssid,
+            cipher              => $cipher,
 
             ssl                 => $site_config_ssl,
             ssl_key             => $site_config_ssl_key,
@@ -250,7 +259,6 @@ define gluon::mesh_vpn (
             ssl_ca              => $site_config_ssl_ca,
         }
     }
-
 
     if $github_owner and $github_repo {
         exec { "/etc/fastd/$community/peers/.git":
@@ -270,21 +278,6 @@ define gluon::mesh_vpn (
             user        => "freifunker",
         }
 
-        if $::gluon::gateway {
-            exec { "/etc/fastd/$community/peers/$hostname":
-                command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";\\nremote $gateway_ipaddr:$fastd_port;/; p }' /root/fastd-$community-key.txt > /etc/fastd/$community/peers/$hostname",
-                creates     => "/etc/fastd/$community/peers/$hostname",
-                require     => Exec["/root/fastd-$community-key.txt"],
-            }
-        }
-        else {
-            exec { "/etc/fastd/$community/peers/$hostname":
-                command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";/; p }' /root/fastd-$community-key.txt > /etc/fastd/$community/peers/$hostname",
-                creates     => "/etc/fastd/$community/peers/$hostname",
-                require     => Exec["/root/fastd-$community-key.txt"],
-            }
-        }
-
         cron { "sync_push_$community":
             command => "cd /etc/fastd/$community/peers/; \
                 git pull --rebase origin master; \
@@ -300,7 +293,23 @@ define gluon::mesh_vpn (
             user    => "freifunker",
             minute  => "*/15",
         }
+    }
 
+    if $real_peers_dir {
+        if $::gluon::gateway {
+            exec { "${real_peers_dir}/${hostname}":
+                command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";\\nremote $gateway_ipaddr:$fastd_port;/; p }' /root/fastd-$community-key.txt > ${real_peers_dir}/${hostname}",
+                creates     => "${real_peers_dir}/${hostname}",
+                require     => Exec["/root/fastd-$community-key.txt"],
+            }
+        }
+        else {
+            exec { "${real_peers_dir}/${hostname}":
+                command     => "/bin/sed -ne '/Public:/ { s/Public: /key \"/; s/$/\";/; p }' /root/fastd-$community-key.txt > ${real_peers_dir}/${hostname}",
+                creates     => "${real_peers_dir}/${hostname}",
+                require     => Exec["/root/fastd-$community-key.txt"],
+            }
+        }
     }
 
     if $::gluon::gateway {

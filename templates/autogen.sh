@@ -17,12 +17,5 @@ git checkout v2015.1.1
 
 make update
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-generic" $*
-make manifest GLUON_BRANCH="$branch"
 
-<% if @auto_update_seckey_file %>
-contrib/sign.sh <%= @auto_update_seckey_file %> "images/sysupgrade/$branch.manifest"
-<% end %>
-
-mkdir -p /srv/firmware-<%= @community %>/$branch/
-cp -Rapv images/* /srv/firmware-<%= @community %>/$branch/
-
+./propagate.sh "$branch"
