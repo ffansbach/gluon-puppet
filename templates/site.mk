@@ -13,9 +13,10 @@ GLUON_SITE_PACKAGES := \
 	gluon-luci-admin \
 	gluon-luci-autoupdater \
 	gluon-luci-portconfig \
-	gluon-next-node \
+	gluon-luci-private-wifi \
 	gluon-mesh-batman-adv-14 \
 	gluon-mesh-vpn-fastd \
+	gluon-next-node \
 	gluon-radvd \
 	gluon-setup-mode \
 	gluon-status-page \
