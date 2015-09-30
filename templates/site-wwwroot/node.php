@@ -1,6 +1,6 @@
 <?php
 
-$peers_dir = '/etc/fastd/<%= @community %>/peers';
+$peers_dir = '<%= @real_peers_dir %>';
 
 $validation = [ 'missing' => [], 'invalid' => [] ];
 
