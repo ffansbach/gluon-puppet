@@ -33,7 +33,7 @@
 
         function success(msg) {
             feedback("alert-success", msg);
-            $("form")[0].reset();            
+            $("form")[0].reset();
         }
 
         function error(msg) {
@@ -81,6 +81,9 @@
                         case "NodeEntryAlreadyExistsError":
                             error("Für den Knoten " + result.hostname + " existiert bereits ein Eintrag.");
                         break;
+                        case "KeyEntryAlreadyExistsError":
+			    error("Dieser Key " + result.key + " ist bereits in Verwendung.");
+			break;
                         default:
                             error("Es ist ein unerwarteter Fehler aufgetreten.");
                     }
