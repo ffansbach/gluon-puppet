@@ -21,7 +21,7 @@ if(!preg_match('/^[0-9a-z]{64}$/', $_POST['key']))  {
 }
 
 if(!empty($validation['missing']) || !empty($validation['invalid'])) {
-    header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request'); 
+    header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
     echo json_encode([ 'type' => 'ValidationError', 'validationResult' => $validation ]);
     exit;
 }
@@ -29,14 +29,23 @@ if(!empty($validation['missing']) || !empty($validation['invalid'])) {
 $target_file = $peers_dir.'/'.$_POST['hostname'];
 
 if(file_exists($target_file)) {
-    header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request'); 
+    header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
     echo json_encode([ 'type' => 'NodeEntryAlreadyExistsError', 'hostname' => $_POST['hostname'] ]);
     exit;
 }
 
+foreach(glob("$peers_dir/*") as $file) {
+    $content = file_get_contents("$file");
+    if (strpos($content, $_POST['key']) !== false) {
+      header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
+      echo json_encode([ 'type' => 'KeyEntryAlreadyExistsError', 'key' => $_POST['key'] ]);
+      exit;
+    }
+}
+
 if(!file_put_contents($target_file, 'key "'.$_POST['key'].'";'))
 {
-    header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error'); 
+    header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error');
     echo json_encode([ 'type' => 'PeersDirectoryNotWritable' ]);
     exit;
 }
