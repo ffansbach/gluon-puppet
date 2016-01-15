@@ -176,9 +176,9 @@ define gluon::site_config (
         docroot         => "/srv/site-$community",
 
         aliases         => [
-            { alias => "/site/", path => "/srv/gluon-$community/site/" },
-            { alias => "/images/", path => "/srv/images-$community/" },
-            { alias => "/firmware/", path => "/srv/firmware-$community/" },
+            { alias => "/site", path => "/srv/gluon-$community/site/" },
+            { alias => "/images", path => "/srv/images-$community/" },
+            { alias => "/firmware", path => "/srv/firmware-$community/" },
         ],
         directories     => $directories,
     }
@@ -191,9 +191,9 @@ define gluon::site_config (
         docroot         => "/srv/site-$community",
 
         aliases         => [
-            { alias => "/site/", path => "/srv/gluon-$community/site/" },
-            { alias => "/images/", path => "/srv/images-$community/" },
-            { alias => "/firmware/", path => "/srv/firmware-$community/" },
+            { alias => "/site", path => "/srv/gluon-$community/site/" },
+            { alias => "/images", path => "/srv/images-$community/" },
+            { alias => "/firmware", path => "/srv/firmware-$community/" },
         ],
         directories     => $directories,
     }
@@ -212,9 +212,9 @@ define gluon::site_config (
             ssl_ca          => $ssl_ca,
 
             aliases         => [
-                { alias => "/site/", path => "/srv/gluon-$community/site/" },
-                { alias => "/images/", path => "/srv/images-$community/" },
-                { alias => "/firmware/", path => "/srv/firmware-$community/" },
+                { alias => "/site", path => "/srv/gluon-$community/site/" },
+                { alias => "/images", path => "/srv/images-$community/" },
+                { alias => "/firmware", path => "/srv/firmware-$community/" },
             ],
             directories     => $directories,
         }
