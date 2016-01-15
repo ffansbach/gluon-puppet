@@ -16,6 +16,10 @@ define gluon::netmon (
     $admin_apikey           = undef,
     $admin_email            = undef,
 
+    $mail_smtp,
+    $mail_user,
+    $mail_password,
+
     $ssl                    = false,
     $ssl_redirect           = false,
     $ssl_cert               = undef, #$::apache::default_ssl_cert,
