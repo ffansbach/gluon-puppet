@@ -152,6 +152,30 @@ define gluon::netmon (
         subscribe   => Exec["netmon_$community-import"],
     }
 
+    gluon::netmon_setting { "${community}-crawl_interfaces":
+	community => $community,
+	key => 'crawl_interfaces',
+	value => 'br-client',
+    }
+
+    gluon::netmon_setting { "${community}-router_status_interface_whitelist":
+	community => $community,
+	key => 'router_status_interface_whitelist',
+	value => 'br-client,br-wan,local-node,mesh-vpn,client0,mesh0,client1,mesh1',
+    }
+
+    gluon::netmon_setting { "${community}-crawl_range":
+	community => $community,
+	key => 'crawl_range',
+	value => '15',
+    }
+
+    gluon::netmon_setting { "${community}-crawl_cycle_start_buffer_in_minutes":
+	community => $community,
+	key => 'crawl_cycle_start_buffer_in_minutes',
+	value => '1',
+    }
+
     cron { "crawl_$community":
         command => "/usr/bin/php /srv/netmon-$community/cronjobs.php > /dev/null",
         user    => root,
