@@ -26,7 +26,8 @@ INSERT INTO `config` VALUES
 (23,'event_notification_router_offline_crawl_cycles','6','2014-10-05 23:55:43','0000-00-00 00:00:00'),
 (24,'community_essid','<%= @community_essid %>', '2014-10-05 23:55:43','0000-00-00 00:00:00'),
 (26, 'network_connection_ipv6', 'true', '2014-10-05 23:55:43','0000-00-00 00:00:00'), 
-(27, 'network_connection_ipv6_interface', 'br_<%= @community %>', '2014-10-05 23:55:43','0000-00-00 00:00:00');
+(27, 'network_connection_ipv6_interface', 'br_<%= @community %>', '2014-10-05 23:55:43','0000-00-00 00:00:00'),
+(28, 'crawl_direct_originators_only', 'true', '2014-10-05 23:55:43','0000-00-00 00:00:00');
 
 INSERT INTO `chipsets` (`id`, `create_date`, `update_date`, `name`, `hardware_name`) VALUES
 (1, '2014-10-07 21:57:22', '2014-10-07 21:57:22', '', 'Unbekannt');
