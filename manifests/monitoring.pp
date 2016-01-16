@@ -72,6 +72,33 @@ exit 2
         line    => 'nagios ALL = (ALL) NOPASSWD: /usr/local/sbin/ifpromisc *',
     }
 
+    file { '/usr/lib/nagios/plugins/check_ifping':
+        ensure      => present,
+        mode        => 0755,
+        content     => '#!/bin/bash
+interface="$1"; shift
+ipaddr="${1-8.8.8.8}"; shift
+
+outfile="`mktemp`"
+ping -I"${interface}" "${ipaddr}" -c 3 -w 1 -i 0.2 > "${outfile}"
+result=$?
+
+grep -e "transmitted" "${outfile}"
+rm -f "${outfile}"
+
+exit $result
+'
+    }
+
+    concat::fragment { "check_ifping":
+	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
+	content     => "define command {
+			    command_name    check_ifping
+			    command_line    /usr/lib/nagios/plugins/check_ifping '\$ARG1$'
+		    }\n",
+    }
+
+
     concat::fragment { "nagios-check-fastd":
 	target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
 	content     => "define command{
