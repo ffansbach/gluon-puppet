@@ -16,4 +16,4 @@ contrib/sign.sh <%= @auto_update_seckey_file %> "output/images/sysupgrade/$branc
 
 rm -rf /srv/firmware-<%= @community %>/$branch
 mkdir -p /srv/firmware-<%= @community %>/$branch/
-cp -Rapv images/* /srv/firmware-<%= @community %>/$branch/
+cp -Rapv output/images/* /srv/firmware-<%= @community %>/$branch/
