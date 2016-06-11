@@ -18,5 +18,6 @@ git checkout v<%= @gluon_version %>
 make update
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-generic"  $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="mpc85xx-generic" $*
+make GLUON_BRANCH="$branch" GLUON_TARGET="x86-64" $*
 
 ./propagate.sh "$branch"
