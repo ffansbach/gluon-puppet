@@ -161,7 +161,7 @@ define gluon::netmon (
     gluon::netmon_setting { "${community}-router_status_interface_whitelist":
 	community => $community,
 	key => 'router_status_interface_whitelist',
-	value => 'br-client,br-wan,local-node,mesh-vpn,client0,mesh0,client1,mesh1',
+	value => 'br-client,br-wan,local-node,mesh-vpn,client0,ibss0,client1,ibss1',
     }
 
     gluon::netmon_setting { "${community}-crawl_range":
