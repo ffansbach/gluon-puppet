@@ -24,7 +24,8 @@ GLUON_SITE_PACKAGES := \
 	iptables \
 	haveged \
 	ffol-configurator \
-	ffol-nodewatcher
+	ffol-nodewatcher \
+	ath9k-broken-wifi-workaround
 
 # The Version string should be appended seperated by a plus sign
 # so it doesn't interfere with the upstream version.  This is how
@@ -38,3 +39,4 @@ GLUON_RELEASE ?= $(DEFAULT_GLUON_RELEASE)
 
 GLUON_PRIORITY ?= 0
 GLUON_LANGS ?= de en
+GLUON_REGION ?= eu
