@@ -104,12 +104,16 @@ class gluon (
     exec { "git-author-name":
        path    => ['/usr/bin', '/usr/sbin', '/bin'],
        command => 'git config --global user.name "Gluon Gateway Robot"',
-       unless  => "git config --global --get user.name|grep 'Gluon Gateway Robot'"
+       unless  => "git config --global --get user.name|grep 'Gluon Gateway Robot'",
+       user    => 'freifunker',
+       environment => ["HOME=/home/freifunker"],
     }
     exec { "git-author-email":
        path    => ['/usr/bin', '/usr/sbin', '/bin'],
        command => 'git config --global user.email "freifunker@$(hostname -f)"',
-       unless  => "git config --global --get user.email|grep 'freifunker@$(hostname -f)'"
+       unless  => "git config --global --get user.email|grep 'freifunker@$(hostname -f)'",
+       user    => 'freifunker',
+       environment => ["HOME=/home/freifunker"],
     }
 
     file { $peers_basedir:
