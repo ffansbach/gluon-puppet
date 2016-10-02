@@ -78,13 +78,7 @@ define gluon::mesh_vpn (
 ) {
     include gluon
 
-    if $github_owner and $github_repo {
-        $real_peers_dir = "/etc/fastd/${community}/peers"
-    }
-    elsif $peers_dir {
-        $real_peers_dir = $peers_dir
-    }
-
+    $real_peers_dir = $peers_dir
 
     # needed network interfaces
     #  - a batman device for the community
@@ -195,12 +189,6 @@ define gluon::mesh_vpn (
         require     => Package['fastd'],
     }
 
-    file { $real_peers_dir:
-        ensure      => directory,
-        group       => 'freifunker',
-        mode        => 775,
-    }
-
     exec { "/root/fastd-$community-key.txt":
         command     => "/usr/bin/fastd --generate-key >> /root/fastd-$community-key.txt",
         creates     => "/root/fastd-$community-key.txt",
@@ -263,41 +251,6 @@ define gluon::mesh_vpn (
         }
     }
 
-    if $github_owner and $github_repo {
-        exec { "/etc/fastd/$community/peers/.git":
-            command     => "/usr/bin/git init-db",
-            cwd         => "/etc/fastd/$community/peers",
-            creates     => "/etc/fastd/$community/peers/.git",
-            require     => File["/etc/fastd/$community/peers"],
-            user        => "freifunker",
-        }
-
-        exec { "/etc/fastd/$community/peers/.git/origin":
-            command     => "git remote rm origin; git remote add origin 'git@github.com:$github_owner/$github_repo.git'",
-            cwd         => "/etc/fastd/$community/peers",
-            path        => "/usr/bin:/bin",
-            unless      => "test \"`git remote show -n origin | sed -n '/Fetch URL/ { s/.*: //; p }'`\" = 'git@github.com:$github_owner/$github_repo.git'",
-            require     => Exec["/etc/fastd/$community/peers/.git"],
-            user        => "freifunker",
-        }
-
-        cron { "sync_push_$community":
-            command => "cd /etc/fastd/$community/peers/; \
-                git pull --rebase origin master; \
-                export GIT_AUTHOR_NAME=\"Gluon Gateway Robot\"; \
-                export GIT_AUTHOR_EMAIL=\"freifunker@`hostname -f`\"; \
-                export GIT_COMMITTER_NAME=\"Gluon Gateway Robot\"; \
-                export GIT_COMMITTER_EMAIL=\"freifunker@`hostname -f`\"; \
-                if test `git status --porcelain | wc -l` -gt 0; then \
-                    git add .; \
-                    git commit -m 'auto-commit'; \
-                    git push origin master; \
-                fi",
-            user    => "freifunker",
-            minute  => "*/15",
-        }
-    }
-
     if $real_peers_dir {
         if $::gluon::gateway {
             exec { "${real_peers_dir}/${hostname}":
@@ -336,7 +289,7 @@ define gluon::mesh_vpn (
         }
     }
 
-    
+
     concat::fragment { "nagios-$community-dns":
         target      => "/etc/nagios3/conf.d/gluon_localhost.cfg",
         content     => "define service {

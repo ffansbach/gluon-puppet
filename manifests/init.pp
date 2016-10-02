@@ -7,6 +7,9 @@
 #
 class gluon (
     $gateway            = true,
+    $peers_basedir      = '/home/freifunker/peers',
+    $github_owner       = undef,
+    $github_repo        = undef,
 ) {
     # include universe_factory apt repository for batman & fastd packages
     apt::key { 'universe_factory':
@@ -83,6 +86,39 @@ class gluon (
         replace     => false,
         owner       => "freifunker",
         group       => "freifunker",
+    }
+
+    file { $peers_basedir:
+        ensure      => directory,
+        group       => 'freifunker',
+        mode        => 775,
+    }
+
+    if $github_owner and $github_repo {
+        exec { "$peers_basedir/.git":
+            command     => "/usr/bin/git clone https://github.com/$github_owner/$github_repo.git .",
+            cwd         => "$peers_basedir",
+            creates     => "$peers_basedir/.git",
+            require     => File["$peers_basedir"],
+            user        => "freifunker",
+        }
+
+        # TODO replace with /home/freifunker/bin/sync
+        #cron { "sync_push_$community":
+        #    command => "cd /home/freifunker/peers/; \
+        #        git pull --rebase origin master; \
+        #        export GIT_AUTHOR_NAME=\"Gluon Gateway Robot\"; \
+        #        export GIT_AUTHOR_EMAIL=\"freifunker@`hostname -f`\"; \
+        #        export GIT_COMMITTER_NAME=\"Gluon Gateway Robot\"; \
+        #        export GIT_COMMITTER_EMAIL=\"freifunker@`hostname -f`\"; \
+        #        if test `git status --porcelain | wc -l` -gt 0; then \
+        #            git add .; \
+        #            git commit -m 'auto-commit'; \
+        #            git push origin master; \
+        #        fi",
+        #    user    => "freifunker",
+        #    minute  => "*/15",
+        #}
     }
 
     exec { "freifunker-ssh-key":
