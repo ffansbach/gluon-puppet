@@ -80,7 +80,7 @@ class gluon (
         group       => "freifunker",
     }
 
-    file { "/home/freifunker/bin/sync-peers"':
+    file { '/home/freifunker/bin/sync-peers':
         ensure      => present,
         source      => 'puppet:///modules/gluon/sync-peers',
         mode        => 0755,
