@@ -74,6 +74,18 @@ class gluon (
         group       => "freifunker",
     }
 
+    file { "/home/freifunker/bin/":
+        ensure      => directory,
+        owner       => "freifunker",
+        group       => "freifunker",
+    }
+
+    file { "/home/freifunker/bin/sync-peers"':
+        ensure      => present,
+        source      => 'puppet:///modules/gluon/sync-peers',
+        mode        => 0755,
+    }
+
     file { "/home/freifunker/.ssh/":
         ensure      => directory,
         owner       => "freifunker",
@@ -86,6 +98,16 @@ class gluon (
         replace     => false,
         owner       => "freifunker",
         group       => "freifunker",
+    }
+
+    # configure git for freifunker
+    exec { "git-author-name":
+       command => 'git config --global user.name "Gluon Gateway Robot"',
+       unless => "git config --global --get user.name|grep 'Gluon Gateway Robot'"
+    }
+    exec { "git-author-email":
+       command => 'git config --global user.email "freifunker@$(hostname -f)"',
+       unless => "git config --global --get user.email|grep 'freifunker@$(hostname -f)'"
     }
 
     file { $peers_basedir:
@@ -103,22 +125,11 @@ class gluon (
             user        => "freifunker",
         }
 
-        # TODO replace with /home/freifunker/bin/sync
-        #cron { "sync_push_$community":
-        #    command => "cd /home/freifunker/peers/; \
-        #        git pull --rebase origin master; \
-        #        export GIT_AUTHOR_NAME=\"Gluon Gateway Robot\"; \
-        #        export GIT_AUTHOR_EMAIL=\"freifunker@`hostname -f`\"; \
-        #        export GIT_COMMITTER_NAME=\"Gluon Gateway Robot\"; \
-        #        export GIT_COMMITTER_EMAIL=\"freifunker@`hostname -f`\"; \
-        #        if test `git status --porcelain | wc -l` -gt 0; then \
-        #            git add .; \
-        #            git commit -m 'auto-commit'; \
-        #            git push origin master; \
-        #        fi",
-        #    user    => "freifunker",
-        #    minute  => "*/15",
-        #}
+        cron { "sync_push":
+            command => "/home/freifunker/bin/sync-peers",
+            user    => "freifunker",
+            minute  => "*/15",
+        }
     }
 
     exec { "freifunker-ssh-key":

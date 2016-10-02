@@ -1,0 +1,17 @@
+#! /bin/bash -xe
+cd $HOME/peers
+
+old_commit_id="`git rev-parse HEAD`"
+git pull --rebase origin master
+new_commit_id="`git rev-parse HEAD`"
+
+if test "$old_commit_id" != "$new_commit_id"; then
+  sudo /usr/bin/killall -HUP fastd
+fi
+
+if test `git status --porcelain | wc -l` -gt 0; then
+  git add .
+  git commit -m 'auto-commit'
+  git push origin master
+fi
+
