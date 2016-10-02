@@ -7,6 +7,9 @@
 #
 class gluon (
     $gateway            = true,
+    $peers_basedir      = '/home/freifunker/peers',
+    $github_owner       = undef,
+    $github_repo        = undef,
 ) {
     # include universe_factory apt repository for batman & fastd packages
     apt::key { 'universe_factory':
@@ -71,6 +74,18 @@ class gluon (
         group       => "freifunker",
     }
 
+    file { "/home/freifunker/bin/":
+        ensure      => directory,
+        owner       => "freifunker",
+        group       => "freifunker",
+    }
+
+    file { '/home/freifunker/bin/sync-peers':
+        ensure      => present,
+        source      => 'puppet:///modules/gluon/sync-peers',
+        mode        => 0755,
+    }
+
     file { "/home/freifunker/.ssh/":
         ensure      => directory,
         owner       => "freifunker",
@@ -83,6 +98,44 @@ class gluon (
         replace     => false,
         owner       => "freifunker",
         group       => "freifunker",
+    }
+
+    # configure git for freifunker
+    exec { "git-author-name":
+       path    => ['/usr/bin', '/usr/sbin', '/bin'],
+       command => 'git config --global user.name "Gluon Gateway Robot"',
+       unless  => "git config --global --get user.name|grep 'Gluon Gateway Robot'",
+       user    => 'freifunker',
+       environment => ["HOME=/home/freifunker"],
+    }
+    exec { "git-author-email":
+       path    => ['/usr/bin', '/usr/sbin', '/bin'],
+       command => 'git config --global user.email "freifunker@$(hostname -f)"',
+       unless  => "git config --global --get user.email|grep 'freifunker@$(hostname -f)'",
+       user    => 'freifunker',
+       environment => ["HOME=/home/freifunker"],
+    }
+
+    file { $peers_basedir:
+        ensure      => directory,
+        group       => 'freifunker',
+        mode        => 775,
+    }
+
+    if $github_owner and $github_repo {
+        exec { "$peers_basedir/.git":
+            command     => "/usr/bin/git clone https://github.com/$github_owner/$github_repo.git .",
+            cwd         => "$peers_basedir",
+            creates     => "$peers_basedir/.git",
+            require     => File["$peers_basedir"],
+            user        => "freifunker",
+        }
+
+        cron { "sync_push":
+            command => "/home/freifunker/bin/sync-peers",
+            user    => "freifunker",
+            minute  => "*/15",
+        }
     }
 
     exec { "freifunker-ssh-key":
