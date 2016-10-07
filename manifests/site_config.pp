@@ -1,7 +1,7 @@
 define gluon::site_config (
     $ensure                 = 'present',
     $community              = $name,
-    $gluon_version          = '2016.1.6',
+    $gluon_version          = '2016.2',
 
     $city_name              = undef,
     $site_domain            = "site.freifunk-$city_name.de",
