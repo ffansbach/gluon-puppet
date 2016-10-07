@@ -45,6 +45,17 @@ class gluon (
         }
     }
 
+    # install haveged for proper entropy
+    package { 'haveged':
+        ensure      => 'present',
+    }
+
+    service { 'haveged':
+        ensure      => running,
+	enable      => true,
+	require     => Package['haveged'],
+    }
+
     # install fastd vpn service
     package { 'fastd':
         ensure      => 'present',
