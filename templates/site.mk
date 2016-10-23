@@ -27,6 +27,17 @@ GLUON_SITE_PACKAGES := \
 	ffol-nodewatcher \
 	ath9k-broken-wifi-workaround
 
+ifeq ($(GLUON_TARGET),x86-generic)
+GLUON_SITE_PACKAGES += \
+    kmod-usb-core \
+    kmod-usb2 \
+    kmod-usb-hid \
+    kmod-usb-net \
+    kmod-usb-net-asix \
+    kmod-usb-net-dm9601-ether \
+    kmod-r8169
+endif
+
 # The Version string should be appended seperated by a plus sign
 # so it doesn't interfere with the upstream version.  This is how
 # "opkg compare-version" works ...
