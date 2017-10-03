@@ -162,6 +162,13 @@ class gluon (
             ensure      => present,
         }
 
+        file { "/etc/dnsmasq.d/_options.conf":
+            ensure      => present,
+            source      => 'puppet:///modules/gluon/dnsmasq-options.conf',
+            notify      => Service['dnsmasq'],
+            require     => Package['dnsmasq'],
+        }
+
         service { 'dnsmasq':
             ensure      => running,
             enable      => true,
