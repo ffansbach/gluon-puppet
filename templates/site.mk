@@ -1,5 +1,4 @@
 GLUON_SITE_PACKAGES := \
-	gluon-alfred \
 	gluon-respondd \
 	gluon-autoupdater \
 	gluon-config-mode-core \
@@ -10,13 +9,12 @@ GLUON_SITE_PACKAGES := \
 	gluon-config-mode-contact-info \
 	gluon-ebtables-filter-multicast \
 	gluon-ebtables-filter-ra-dhcp \
-	gluon-luci-admin \
-	gluon-luci-autoupdater \
-	gluon-luci-portconfig \
-	gluon-luci-private-wifi \
+	gluon-web-admin \
+	gluon-web-autoupdater \
+	gluon-web-network \
+	gluon-web-private-wifi \
 	gluon-mesh-batman-adv-14 \
 	gluon-mesh-vpn-fastd \
-	gluon-next-node \
 	gluon-radvd \
 	gluon-setup-mode \
 	gluon-status-page \
@@ -48,7 +46,7 @@ DEFAULT_GLUON_RELEASE := <%= @gluon_version %>+$(shell date '+%Y%m%d')
 # Allow overriding the release number from the command line
 GLUON_RELEASE ?= $(DEFAULT_GLUON_RELEASE)
 
-GLUON_ATH10K_MESH ?= ibss
+GLUON_ATH10K_MESH ?= 11s
 GLUON_PRIORITY ?= 0
 GLUON_LANGS ?= de en
 GLUON_REGION ?= eu

@@ -16,10 +16,11 @@ git fetch origin
 git checkout v<%= @gluon_version %>
 
 make update
+make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-tiny"  $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-generic"  $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="mpc85xx-generic" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="x86-64" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="x86-generic" $*
-make GLUON_BRANCH="$branch" GLUON_TARGET="x86-kvm_guest" $*
+make GLUON_BRANCH="$branch" GLUON_TARGET="x86-geode" $*
 
 ./propagate.sh "$branch"
