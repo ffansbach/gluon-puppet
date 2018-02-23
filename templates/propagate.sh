@@ -17,4 +17,4 @@ fi
 rm -rf /srv/firmware-<%= @community %>/$branch
 mkdir -p /srv/firmware-<%= @community %>/$branch/
 cp -Rapv output/images/* /srv/firmware-<%= @community %>/$branch/
-cp -Rapv output/modules/ /srv/firmware-<%= @community %>/$branch/
+cp -Rapv output/packages/ /srv/firmware-<%= @community %>/$branch/
