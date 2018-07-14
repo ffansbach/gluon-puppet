@@ -11,6 +11,7 @@ define gluon::site_config (
     $ip4_netmask            = undef,
     $ip6_address            = undef,
     $ip6_prefix             = undef,
+    $ip6_gateway            = undef,
 
     $ntp_server             = undef,
     $fastd_port             = undef,
