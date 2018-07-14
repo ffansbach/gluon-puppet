@@ -3,9 +3,9 @@ class gluon::monitoring {
         ensure  => present,
     }
 
-    file { '/etc/apache2/conf.d':
-        ensure  => directory,
-    }
+    #file { '/etc/apache2/conf.d':
+    #    ensure  => directory,
+    #}
 
     file { '/etc/apache2/conf.d/nagios3.conf':
         ensure  => symlink,

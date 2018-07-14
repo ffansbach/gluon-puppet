@@ -8,6 +8,7 @@
 # - The $ip4_netmask wrt. $ip4_address
 # - The $ip6_address of this gateway within the Mesh network; /64 mask is assumed
 # - The $ip6_prefix of the Mesh network with trailing double colons
+# - The $ip6_gateway of the Mesh network
 # - The $fastd_port to configure fastd to listen on
 # - The $site_config option, whether to provide a gluon site directory
 # - The $city_name to use throughout site/site.conf
@@ -46,6 +47,7 @@ define gluon::mesh_vpn (
 
     $ip6_address        = undef,
     $ip6_prefix         = undef,
+    $ip6_gateway        = undef,
 
     $fastd_port         = 10000,
     $mtu                = 1426,
@@ -90,7 +92,7 @@ define gluon::mesh_vpn (
         netmask         => $ip4_netmask,
         post_up         => [
             "ip -6 a a $ip6_address/64 dev br_$community",
-            "test -d /srv/netmon-$community && ip -6 a a ${ip6_prefix}42/64 dev br_$community"
+            "if test -d /srv/netmon-$community; then ip -6 a a ${ip6_prefix}42/64 dev br_$community; fi"
         ],
         before          => Network::Interface["bat_$community"],
     }
@@ -234,6 +236,7 @@ define gluon::mesh_vpn (
             ip4_netmask         => $ip4_netmask,
             ip6_address         => $ip6_address,
             ip6_prefix          => $ip6_prefix,
+            ip6_gateway         => $ip6_gateway,
             ntp_server          => $ip6_address,
             fastd_port          => $fastd_port,
             auto_update_pubkey  => $auto_update_pubkey,
