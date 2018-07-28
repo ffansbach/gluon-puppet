@@ -1,7 +1,7 @@
 define gluon::site_config (
     $ensure                 = 'present',
     $community              = $name,
-    $gluon_version          = '2017.1.8',
+    $gluon_version          = '2018.1',
 
     $city_name              = undef,
     $site_domain            = "site.freifunk-$city_name.de",
@@ -25,6 +25,7 @@ define gluon::site_config (
     $mesh_bssid             = "02:44:CA:FF:23:42",
     $mesh_bssid24           = "12:CA:FF:EE:23:42",
     $gateway_ipaddr         = $ipaddress_eth0,
+    $domain_seed            = undef,
 
     $ssl                    = false,
     $ssl_cert               = $::apache::default_ssl_cert,
