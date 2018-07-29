@@ -62,6 +62,7 @@ define gluon::mesh_vpn (
     $github_owner       = undef,
     $github_repo        = undef,
     $peers_dir          = undef,
+    $domain_seed        = undef,
 
     $cipher             = 'salsa2012+gmac',
 
@@ -245,6 +246,7 @@ define gluon::mesh_vpn (
             mesh_bssid24        => $mesh_bssid24,
             cipher              => $cipher,
             peers_dir           => $real_peers_dir,
+            domain_seed         => $domain_seed,
 
             ssl                 => $site_config_ssl,
             ssl_key             => $site_config_ssl_key,
