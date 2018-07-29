@@ -50,6 +50,7 @@ DEFAULT_GLUON_RELEASE := <%= @gluon_version %>+$(shell date '+%Y%m%d')
 # Allow overriding the release number from the command line
 GLUON_RELEASE ?= $(DEFAULT_GLUON_RELEASE)
 
+GLUON_MULTIDOMAIN ?= 0
 GLUON_ATH10K_MESH ?= 11s
 GLUON_PRIORITY ?= 0
 GLUON_LANGS ?= de en
