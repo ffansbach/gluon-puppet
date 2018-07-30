@@ -16,6 +16,7 @@ git fetch origin
 git checkout v<%= @gluon_version %>
 
 make update
+export GLUON_RELEASE=$(make show-version)
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-tiny"  $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-generic"  $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-nand" $*
