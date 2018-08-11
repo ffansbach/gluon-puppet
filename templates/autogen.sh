@@ -29,6 +29,6 @@ make GLUON_BRANCH="$branch" GLUON_TARGET="ramips-rt305x" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="sunxi" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="x86-64" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="x86-generic" $*
-#make GLUON_BRANCH="$branch" GLUON_TARGET="x86-geode" $*
+make GLUON_BRANCH="$branch" GLUON_TARGET="x86-geode" $*
 
 ./propagate.sh "$branch"
