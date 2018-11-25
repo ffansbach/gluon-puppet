@@ -25,8 +25,6 @@ GLUON_SITE_PACKAGES := \
 	iwinfo \
 	iptables \
 	haveged \
-	ffol-configurator \
-	ffol-nodewatcher \
 	ath9k-broken-wifi-workaround
 
 ifeq ($(GLUON_TARGET),x86-generic)
