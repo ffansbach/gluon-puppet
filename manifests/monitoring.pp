@@ -42,7 +42,7 @@ class gluon::monitoring {
 
     file { '/usr/lib/nagios/plugins/check_ifpromisc':
         ensure      => present,
-        mode        => 0755,
+        mode        => '0755',
         content     => '#!/bin/sh
 if [ "$1" = "" ]; then
   echo "Usage: $0 <IFNAME>"
@@ -78,7 +78,7 @@ exit 2
 
     file { '/usr/lib/nagios/plugins/check_ifping':
         ensure      => present,
-        mode        => 0755,
+        mode        => '0755',
         content     => '#!/bin/bash
 interface="$1"; shift
 ipaddr="${1-8.8.8.8}"; shift

@@ -12,7 +12,7 @@ class gluon::batman {
     file { '/usr/local/sbin/install-batman-adv':
         ensure      => present,
         source      => 'puppet:///modules/gluon/install-batman-adv',
-        mode        => 0755,
+        mode        => '0755',
     }
 
     exec { 'install-batman-adv':

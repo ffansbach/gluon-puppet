@@ -151,7 +151,7 @@ define gluon::mesh_vpn (
             chain           => 'from_mesh',
             proto           => 'all',
             destination     => "$ip4_address/$ip4_netmask",
-            jump            => RETURN,
+            jump            => 'RETURN',
         }
 
         # run all traffic from this mesh through "from_mesh" filter chain
@@ -171,7 +171,7 @@ define gluon::mesh_vpn (
             proto           => 'all',
             outiface        => "br_$community",
             destination     => "$ip4_address/$ip4_netmask",
-            action          => accept,
+            action          => 'accept',
         }
 
         # masquerade outgoing traffic from community's iprange

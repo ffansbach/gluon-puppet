@@ -94,7 +94,7 @@ class gluon (
     file { '/home/freifunker/bin/sync-peers':
         ensure      => present,
         source      => 'puppet:///modules/gluon/sync-peers',
-        mode        => 0755,
+        mode        => '0755',
     }
 
     file { "/home/freifunker/.ssh/":
@@ -130,7 +130,7 @@ class gluon (
     file { $peers_basedir:
         ensure      => directory,
         group       => 'freifunker',
-        mode        => 775,
+        mode        => '0775',
     }
 
     if $github_owner and $github_repo {
@@ -182,7 +182,7 @@ class gluon (
     file { '/etc/rc.local':
         ensure      => present,
         source      => 'puppet:///modules/gluon/rc.local',
-        mode        => 0755,
+        mode        => '0755',
     }
 
 
@@ -196,7 +196,7 @@ class gluon (
         # vpn gateway control scripts
         concat { '/usr/local/sbin/ffgw-on':
             ensure      => present,
-            mode        => 0755,
+            mode        => '0755',
         }
 
         concat::fragment { "ffgw-on-base":
@@ -206,7 +206,7 @@ class gluon (
 
         concat { '/usr/local/sbin/ffgw-off':
             ensure      => present,
-            mode        => 0755,
+            mode        => '0755',
         }
 
         concat::fragment { "ffgw-off-base":
