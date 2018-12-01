@@ -54,6 +54,7 @@ define gluon::mesh_vpn (
 
     $mesh_bssid         = undef,
     $mesh_bssid24       = undef,
+    $mesh_macaddr       = undef,
 
     $dhcp_range_start   = undef,
     $dhcp_range_end     = undef,
