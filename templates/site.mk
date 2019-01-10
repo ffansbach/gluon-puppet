@@ -6,7 +6,6 @@ GLUON_FEATURES := \
 	autoupdater \
 	ebtables-filter-multicast \
 	ebtables-filter-ra-dhcp \
-	ebtables-limit-arp \
 	mesh-batman-adv-14 \
 	mesh-vpn-fastd \
 	radvd \
@@ -14,7 +13,8 @@ GLUON_FEATURES := \
 	respondd \
 	status-page \
 	web-advanced \
-	web-wizard
+	web-wizard \
+	config-mode-geo-location-osm
 
 ##	GLUON_SITE_PACKAGES
 #		Specify additional Gluon/LEDE packages to include here;
@@ -25,8 +25,7 @@ GLUON_SITE_PACKAGES := \
 	iwinfo \
 	iptables \
 	haveged \
-	ffol-configurator \
-	ffol-nodewatcher \
+	gluon-config-mode-geo-location-osm \
 	ath9k-broken-wifi-workaround
 
 ifeq ($(GLUON_TARGET),x86-generic)
