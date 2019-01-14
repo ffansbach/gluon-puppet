@@ -21,7 +21,6 @@ make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-tiny"  $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-generic"  $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ar71xx-nand" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ipq40xx" $*
-make GLUON_BRANCH="$branch" GLUON_TARGET="ipq806x" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="mpc85xx-generic" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ramips-mt7620" $*
 make GLUON_BRANCH="$branch" GLUON_TARGET="ramips-mt7621" $*
