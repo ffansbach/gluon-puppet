@@ -14,7 +14,8 @@ GLUON_FEATURES := \
 	status-page \
 	web-advanced \
 	web-wizard \
-	config-mode-geo-location-osm
+	config-mode-geo-location-osm \
+	web-private-wifi
 
 ##	GLUON_SITE_PACKAGES
 #		Specify additional Gluon/LEDE packages to include here;
@@ -25,7 +26,6 @@ GLUON_SITE_PACKAGES := \
 	iwinfo \
 	iptables \
 	haveged \
-	gluon-config-mode-geo-location-osm \
 	ath9k-broken-wifi-workaround
 
 ifeq ($(GLUON_TARGET),x86-generic)
