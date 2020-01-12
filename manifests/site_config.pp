@@ -94,12 +94,12 @@ define gluon::site_config (
 
     file { "/srv/gluon-$community/site/domains/batman-legacy.conf":
         ensure      => present,
-	content     => template('gluon/domains/batman-legacy.conf'),
+        content     => template('gluon/domains/batman-legacy.conf'),
     }
 
     file { "/srv/gluon-$community/site/domains/batman.conf":
         ensure      => present,
-	content     => template('gluon/domains/batman.conf'),
+        content     => template('gluon/domains/batman.conf'),
     }
 
     exec { "/srv/gluon-$community/site/site.conf":
