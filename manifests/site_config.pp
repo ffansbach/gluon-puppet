@@ -70,6 +70,10 @@ define gluon::site_config (
         ensure      => directory
     }
 
+    file { "/srv/gluon-$community/site/domains/":
+        ensure      => directory
+    }
+
     file { "/srv/gluon-$community/gen-site.conf.sh":
         ensure      => present,
         content     => template('gluon/site.conf'),
@@ -86,6 +90,16 @@ define gluon::site_config (
     file { "/srv/gluon-$community/site/i18n/en.po":
         ensure      => present,
         content     => template('gluon/i18n/en.po'),
+    }
+
+    file { "/srv/gluon-$community/site/domains/batman-legacy.conf":
+        ensure      => present,
+        content     => template('gluon/domains/batman-legacy.conf'),
+    }
+
+    file { "/srv/gluon-$community/site/domains/batman.conf":
+        ensure      => present,
+        content     => template('gluon/domains/batman.conf'),
     }
 
     exec { "/srv/gluon-$community/site/site.conf":

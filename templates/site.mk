@@ -15,7 +15,8 @@ GLUON_FEATURES := \
 	web-advanced \
 	web-wizard \
 	config-mode-geo-location-osm \
-	web-private-wifi
+	web-private-wifi \
+	scheduled-domain-switch
 
 ##	GLUON_SITE_PACKAGES
 #		Specify additional Gluon/LEDE packages to include here;
@@ -55,3 +56,4 @@ GLUON_PRIORITY ?= 0
 GLUON_LANGS ?= de en
 GLUON_REGION ?= eu
 GLUON_DEPRECATED ?= full
+GLUON_MULTIDOMAIN ?= 1
