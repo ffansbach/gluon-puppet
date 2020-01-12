@@ -7,8 +7,8 @@ GLUON_FEATURES := \
 	ebtables-filter-multicast \
 	ebtables-filter-ra-dhcp \
 	mesh-batman-adv-14 \
+	mesh-batman-adv-15 \
 	mesh-vpn-fastd \
-	radvd \
 	radv-filterd \
 	respondd \
 	status-page \
@@ -54,3 +54,4 @@ GLUON_ATH10K_MESH ?= 11s
 GLUON_PRIORITY ?= 0
 GLUON_LANGS ?= de en
 GLUON_REGION ?= eu
+GLUON_DEPRECATED ?= full
