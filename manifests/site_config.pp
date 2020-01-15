@@ -98,7 +98,7 @@ define gluon::site_config (
     }
 
     exec { "/srv/gluon-$community/site/domains/batman_legacy.conf":
-        command     => "/srv/gluon-$community/gen-domains.conf.sh > /srv/gluon-$community/site/domains/",
+        command     => "/srv/gluon-$community/gen-domains.conf.sh",
         path        => "/bin:/usr/bin",
         refreshonly => true,
     }
