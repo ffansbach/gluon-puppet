@@ -15,8 +15,7 @@ GLUON_FEATURES := \
 	web-advanced \
 	web-wizard \
 	config-mode-geo-location-osm \
-	web-private-wifi \
-	scheduled-domain-switch
+	web-private-wifi
 
 ##	GLUON_SITE_PACKAGES
 #		Specify additional Gluon/LEDE packages to include here;
@@ -50,10 +49,9 @@ DEFAULT_GLUON_RELEASE := <%= @gluon_version %>+$(shell date '+%Y%m%d')
 # Allow overriding the release number from the command line
 GLUON_RELEASE ?= $(DEFAULT_GLUON_RELEASE)
 
-GLUON_MULTIDOMAIN ?= 0
+GLUON_MULTIDOMAIN = 1
 GLUON_ATH10K_MESH ?= 11s
 GLUON_PRIORITY ?= 0
 GLUON_LANGS ?= de en
 GLUON_REGION ?= eu
 GLUON_DEPRECATED ?= full
-GLUON_MULTIDOMAIN ?= 1
