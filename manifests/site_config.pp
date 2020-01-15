@@ -74,12 +74,17 @@ define gluon::site_config (
         ensure      => directory
     }
 
-    file { "/srv/gluon-$community/gen-site.conf.sh":
+    file { "/srv/gluon-$community/gen-domains.conf.sh":
+        ensure      => present,
+        content     => template('gluon/domains.conf'),
+        mode        => 755,
+        notify      => Exec["/srv/gluon-$community/site/domains/batman_legacy.conf"],
+        require     => Exec["/root/fastd-$community-key.txt"],
+    }
+
+    file { "/srv/gluon-$community/site/site.conf":
         ensure      => present,
         content     => template('gluon/site.conf'),
-        mode        => 755,
-        notify      => Exec["/srv/gluon-$community/site/site.conf"],
-        require     => Exec["/root/fastd-$community-key.txt"],
     }
 
     file { "/srv/gluon-$community/site/i18n/de.po":
@@ -92,18 +97,8 @@ define gluon::site_config (
         content     => template('gluon/i18n/en.po'),
     }
 
-    file { "/srv/gluon-$community/site/domains/batman-legacy.conf":
-        ensure      => present,
-        content     => template('gluon/domains/batman-legacy.conf'),
-    }
-
-    file { "/srv/gluon-$community/site/domains/batman.conf":
-        ensure      => present,
-        content     => template('gluon/domains/batman.conf'),
-    }
-
-    exec { "/srv/gluon-$community/site/site.conf":
-        command     => "/srv/gluon-$community/gen-site.conf.sh > /srv/gluon-$community/site/site.conf",
+    exec { "/srv/gluon-$community/site/domains/batman_legacy.conf":
+        command     => "/srv/gluon-$community/gen-domains.conf.sh > /srv/gluon-$community/site/domains/",
         path        => "/bin:/usr/bin",
         refreshonly => true,
     }
